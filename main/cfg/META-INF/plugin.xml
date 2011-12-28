@@ -1,0 +1,27 @@
+<idea-plugin version="2">
+  <name>SBT Changelist action</name>
+  <description>
+    Provides the ability to define custom actions that you can invoke on
+    any VCS changelist (via the context menu).
+  </description>
+  <version>0.1</version>
+  <vendor>Shorn</vendor>
+  <idea-version since-build="8000"/>
+
+  <application-components>
+  </application-components>
+
+  <project-components>
+    <component>
+      <implementation-class>
+        net.intellij.plugins.sbtchangelistaction.SbtChangelistActionComponent
+      </implementation-class>
+    </component>
+  </project-components>
+
+  <actions>
+  </actions>
+
+  <extensions defaultExtensionNs="com.intellij">
+  </extensions>
+</idea-plugin>
