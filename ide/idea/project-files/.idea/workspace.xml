@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="8e013b3f-dbc3-4ef8-b33e-5eefecfb59b0" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../main/main.iml" afterPath="$PROJECT_DIR$/../main/main.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="sbt-changelist-action.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -82,7 +81,7 @@
       <file leaf-file-name="plugin.xml" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../../../main/cfg/META-INF/plugin.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="26" column="106" selection-start="684" selection-end="684" vertical-scroll-proportion="0.515873">
+            <state line="26" column="14" selection-start="684" selection-end="684" vertical-scroll-proportion="0.515873">
               <folding />
             </state>
           </provider>
@@ -192,6 +191,7 @@
     </navigator>
     <panes>
       <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -212,7 +212,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -228,12 +227,12 @@
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="FullScreen" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
+    <property name="FullScreen" value="false" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="dynamic.classpath" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="dynamic.classpath" value="false" />
   </component>
   <component name="RunManager" selected="Plugin.test">
     <configuration default="false" name="TestMain" type="Application" factoryName="Application" temporary="true">
@@ -423,7 +422,7 @@
       <window_info id="Gradle" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32979476" sideWeight="0.6704981" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32950193" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2413305" sideWeight="0.6704981" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24062279" sideWeight="0.6704981" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25798213" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -550,6 +549,11 @@
         <state line="31" column="7" selection-start="1361" selection-end="1361" vertical-scroll-proportion="0.49209931" />
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/../../../.hgignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/../../../main/prod-src/java/net/intellij/plugins/sbtchangelistaction/SbtChangelistActionComponent.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="109" column="0" selection-start="2758" selection-end="2758" vertical-scroll-proportion="0.0" />
@@ -560,16 +564,9 @@
         <state line="20" column="13" selection-start="649" selection-end="649" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../../.hgignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../../main/cfg/META-INF/plugin.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="106" selection-start="684" selection-end="684" vertical-scroll-proportion="0.515873">
+        <state line="26" column="14" selection-start="684" selection-end="684" vertical-scroll-proportion="0.515873">
           <folding />
         </state>
       </provider>
