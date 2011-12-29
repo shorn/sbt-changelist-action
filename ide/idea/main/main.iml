@@ -5,9 +5,30 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../main">
       <sourceFolder url="file://$MODULE_DIR$/../../../main/prod-src/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../main/prod-src/resource" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../main/prod-src/groovy" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="idea jdk" jdkType="IDEA JDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../../main/lib/slf4j-api-1.6.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../../main/lib/slf4j-jcl-1.6.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" scope="PROVIDED" name="groovy-all-1.7.3" level="application" />
   </component>
 </module>
 

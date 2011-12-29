@@ -1,28 +1,60 @@
 package net.intellij.plugins.sbtchangelistaction;
 
 import com.intellij.openapi.components.ProjectComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.StorageScheme;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.IconLoader;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 
-public class SbtChangelistActionComponent
+@State(
+  name = SbtChangelistActionComponent.COMPONENT_NAME,
+  storages = {
+    @Storage(id = "sbt-changelist-action-default", file = "$PROJECT_FILE$"),
+    @Storage(
+      id = "sbt-changelist-action-dir",
+      file = "$PROJECT_CONFIG_DIR$/sbt-changelist-action.xml",
+      scheme = StorageScheme.DIRECTORY_BASED )})
+public abstract class SbtChangelistActionComponent
 implements
   Configurable,
   ProjectComponent
 {
+  public static final String COMPONENT_NAME = "SBT VCS Changelist Action";
+
+//  private final com.intellij.openapi.diagnostic.Logger jlog = com.intellij.openapi.diagnostic.Logger.getInstance(getClass());
+
+//  private final Logger log = LoggerFactory.getLogger(getClass());
+
+  private Icon pluginIcon;
+  protected Project project;
+
+  public SbtChangelistActionComponent(Project project){
+    this.project = project;
+  }
+
+  // ---------- Configurable ----------
 
   @Nls
   @Override
   public String getDisplayName() {
-    return null;
+    return COMPONENT_NAME;
   }
 
   @Override
   public Icon getIcon() {
-    return null;
+    if (pluginIcon == null) {
+      pluginIcon = IconLoader.getIcon("icons/frog32.png");
+    }
+    return pluginIcon;
   }
 
   @Override
@@ -30,36 +62,49 @@ implements
     return null;
   }
 
-  @Override
-  public void projectOpened() {
 
-  }
+ // ---------- ProjectComponent ----------
 
-  @Override
-  public void projectClosed() {
+//  @Override
+//  public void projectOpened() {
+//    log.debug("projectOpened() - {}", project.getName());
+//  }
 
-  }
+//  @Override
+//  public void projectClosed() {
+//    log.debug("projectClosed() - " +  project.getName());
+//  }
 
-  @Override
-  public void initComponent() {
+  // ---------- BaseComponent ----------
 
-  }
+//  @Override
+//  public void initComponent() {
+//    log.debug("initComponent() - " +  project.getName());
+//  }
 
-  @Override
-  public void disposeComponent() {
+//  @Override
+//  public void disposeComponent() {
+//    log.debug("disposeComponent() - " +  project.getName());
+//  }
 
-  }
 
+  // ---------- NamedComponent ----------
   @NotNull
   @Override
   public String getComponentName() {
-    return null;
+    return "sbt-changelist-action project component";
   }
 
-  @Override
-  public JComponent createComponent() {
-    return null;
-  }
+
+  // ---------- UnnamedConfigurable ----------
+
+//  @Override
+//  public JComponent createComponent() {
+//    JPanel panel = new JPanel();
+//    panel.add(new JLabel("not much here yet"));
+//
+//    return panel;
+//  }
 
   @Override
   public boolean isModified() {
@@ -80,4 +125,5 @@ implements
   public void disposeUIResources() {
 
   }
+
 }
