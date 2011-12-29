@@ -7,11 +7,6 @@ ide/.idea/workspace.xml and .gradle, etc.
 TODO:SBT create dirs ?
 
 
-I've also added the guava-r09.jar from the idea lib dir, maybe it's not
-supposed to be part of the plugin openapi, but I like Guava - I'll bundle it
-with the plugin if I have to.
-
-
 Viewing logs.
 Logs from this plugin are written to the normal $LOG_DIR$/idea.log file.
 You can also add the following to the idea bin/log.xml file if you want
