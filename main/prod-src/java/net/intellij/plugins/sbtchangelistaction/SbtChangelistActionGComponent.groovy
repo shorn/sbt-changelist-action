@@ -1,24 +1,38 @@
 package net.intellij.plugins.sbtchangelistaction
 
+import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.StorageScheme
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.diagnostic.Logger
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory
+import com.intellij.util.xmlb.XmlSerializerUtil
 import javax.swing.JComponent
+import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.JLabel;
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-
-class SbtChangelistActionGComponent extends SbtChangelistActionComponent {
+@State(
+  name = SbtChangelistActionComponent.COMPONENT_NAME,
+  storages = [
+    @Storage(id = "sbt-changelist-action-default", file = '$PROJECT_FILE$'),
+    @Storage(
+     id = "sbt-changelist-action-dir",
+     file = '$PROJECT_CONFIG_DIR$/sbt-changelist-action.xml',
+     scheme = StorageScheme.DIRECTORY_BASED )])
+class SbtChangelistActionGComponent
+extends SbtChangelistActionComponent
+implements PersistentStateComponent<CaState>
+{
 
   private final Logger log = LoggerFactory.getLogger(getClass());
 
-  public SbtChangelistActionGComponent(Project project) {
+  SbtChangelistActionGComponent(Project project) {
     super(project)
   }
+
+
+  // ---------- ProjectComponent ----------
 
   @Override
   void projectOpened() {
@@ -30,6 +44,9 @@ class SbtChangelistActionGComponent extends SbtChangelistActionComponent {
     log.debug "projectClosed() - $project.name"
   }
 
+
+  // ---------- BaseComponent ----------
+
   @Override
   void initComponent() {
     log.debug "initComponent() - $project.name"
@@ -40,12 +57,51 @@ class SbtChangelistActionGComponent extends SbtChangelistActionComponent {
     log.debug "disposeComponent() - $project.name"
   }
 
-  @Override
-  public JComponent createComponent() {
-    JPanel panel = new JPanel();
-    panel.add(new JLabel("not much here yet 2"));
 
-    return panel;
+  // ---------- UnnamedConfigurable ----------
+
+  @Override
+  JComponent createComponent() {
+    JPanel panel = new JPanel()
+    panel.add(new JLabel("not much here yet 2"))
+
+    panel
   }
 
+
+  // ---------- PersistentStateComponent ----------
+
+  private final CaState state = new CaState();
+
+  @Override
+  CaState getState() {
+    return state;
+  }
+
+  /**
+   * Loads state from configuration file.
+   */
+  @Override
+  void loadState(CaState state) {
+    XmlSerializerUtil.copyBean(state, this.state)
+  }
+
+
 }
+
+
+class CaState {
+  List<ActionCommand> commands = []
+}
+
+
+class ActionCommand {
+  String absolutePath
+  String consoleOutput
+  String name
+  String command
+  String options
+}
+
+
+
