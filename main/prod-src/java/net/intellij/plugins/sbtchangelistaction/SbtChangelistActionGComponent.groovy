@@ -7,10 +7,7 @@ import com.intellij.openapi.components.StorageScheme
 import com.intellij.openapi.project.Project
 import com.intellij.util.xmlb.XmlSerializerUtil
 import javax.swing.JComponent
-import javax.swing.JLabel
-import javax.swing.JPanel
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import com.intellij.openapi.diagnostic.Logger
 
 @State(
   name = SbtChangelistActionComponent.COMPONENT_NAME,
@@ -25,7 +22,8 @@ extends SbtChangelistActionComponent
 implements PersistentStateComponent<CaState>
 {
 
-  private final Logger log = LoggerFactory.getLogger(getClass());
+  private final Logger log = Logger.getInstance(getClass());
+
 
   SbtChangelistActionGComponent(Project project) {
     super(project)
@@ -49,7 +47,7 @@ implements PersistentStateComponent<CaState>
 
   @Override
   void initComponent() {
-    log.debug "initComponent() - $project.name"
+    log.debug "initComponent() - $project.name [P${project.hashCode()}] [C${this.hashCode()}]"
   }
 
   @Override
@@ -62,10 +60,10 @@ implements PersistentStateComponent<CaState>
 
   @Override
   JComponent createComponent() {
-    JPanel panel = new JPanel()
-    panel.add(new JLabel("not much here yet 2"))
+    log.debug "createComponent() - $project.name"
 
-    panel
+    return new CaConfigurator(project).init().panel
+    
   }
 
 
