@@ -31,7 +31,7 @@ to log to a separate file as well though.
     </layout>
   </appender>
 
-  <category name="#net.intellij.plugins.sbtchangelistaction">
+  <category name="#net.intellij.plugins.changelistaction">
     <level value="DEBUG"/>
     <appender-ref ref="SBT_CLA_FILE"/>
   </category>

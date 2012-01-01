@@ -1,4 +1,4 @@
-package net.intellij.plugins.sbtchangelistaction;
+package net.intellij.plugins.changelistaction;
 
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.options.Configurable;
@@ -22,10 +22,10 @@ implements
 //  private final Logger log = LoggerFactory.getLogger(getClass());
 
   private Icon pluginIcon;
-  protected Project project;
+//  protected Project project;
 
   public SbtChangelistActionComponent(Project project){
-    this.project = project;
+//    this.project = project;
   }
 
   // ---------- Configurable ----------

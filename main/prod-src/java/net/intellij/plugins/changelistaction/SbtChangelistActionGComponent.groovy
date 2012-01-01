@@ -1,4 +1,4 @@
-package net.intellij.plugins.sbtchangelistaction
+package net.intellij.plugins.changelistaction
 
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.xmlb.XmlSerializerUtil
 import javax.swing.JComponent
 import com.intellij.openapi.diagnostic.Logger
+import net.intellij.plugins.changelistaction.config.ClaConfigurator
 
 @State(
   name = SbtChangelistActionComponent.COMPONENT_NAME,
@@ -19,14 +20,17 @@ import com.intellij.openapi.diagnostic.Logger
      scheme = StorageScheme.DIRECTORY_BASED )])
 class SbtChangelistActionGComponent
 extends SbtChangelistActionComponent
-implements PersistentStateComponent<CaState>
+implements PersistentStateComponent<ClaState>
 {
+  private final Logger log = Logger.getInstance(getClass())
 
-  private final Logger log = Logger.getInstance(getClass());
+  Project project
+  ClaConfigurator configurator;
 
 
   SbtChangelistActionGComponent(Project project) {
     super(project)
+    this.project = project
   }
 
 
@@ -62,17 +66,21 @@ implements PersistentStateComponent<CaState>
   JComponent createComponent() {
     log.debug "createComponent() - $project.name"
 
-    return new CaConfigurator(project).init().panel
-    
+    if( configurator == null ){
+      configurator = new ClaConfigurator(this).init()
+      configurator.updateConfiguratorFromState(this.state)
+    }
+
+    return configurator.panel
   }
 
 
   // ---------- PersistentStateComponent ----------
 
-  private final CaState state = new CaState();
+  ClaState state = new ClaState();
 
   @Override
-  CaState getState() {
+  ClaState getState() {
     return state;
   }
 
@@ -80,20 +88,19 @@ implements PersistentStateComponent<CaState>
    * Loads state from configuration file.
    */
   @Override
-  void loadState(CaState state) {
+  void loadState(ClaState state) {
     XmlSerializerUtil.copyBean(state, this.state)
   }
 
-
 }
 
 
-class CaState {
-  List<ActionCommand> commands = []
+class ClaState {
+  List<ClaCommand> commands = []
 }
 
 
-class ActionCommand {
+class ClaCommand {
   String absolutePath
   String consoleOutput
   String name
