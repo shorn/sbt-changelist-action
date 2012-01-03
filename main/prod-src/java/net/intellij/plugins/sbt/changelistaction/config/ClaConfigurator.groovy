@@ -1,4 +1,4 @@
-package net.intellij.plugins.changelistaction.config
+package net.intellij.plugins.sbt.changelistaction.config
 
 import javax.swing.JPanel
 import java.awt.BorderLayout
@@ -8,7 +8,7 @@ import javax.swing.ListSelectionModel
 import ca.odell.glazedlists.gui.TableFormat
 import ca.odell.glazedlists.EventList
 import ca.odell.glazedlists.swing.EventTableModel
-import net.intellij.plugins.changelistaction.util.NoCellFocusRenderer
+import net.intellij.plugins.sbt.changelistaction.util.NoCellFocusRenderer
 import ca.odell.glazedlists.GlazedLists
 import ca.odell.glazedlists.BasicEventList
 import com.intellij.ui.components.JBScrollPane
@@ -20,17 +20,20 @@ import javax.swing.JButton
 
 import java.awt.event.KeyEvent
 
-import groovy.swing.SwingBuilder
-import net.intellij.plugins.changelistaction.ClaState
-import net.intellij.plugins.changelistaction.ClaCommand
-import net.intellij.plugins.changelistaction.SbtChangelistActionGComponent
+import net.intellij.plugins.sbt.changelistaction.ClaState
+import net.intellij.plugins.sbt.changelistaction.ClaCommand
+import net.intellij.plugins.sbt.changelistaction.SbtChangelistActionGComponent
 import com.intellij.openapi.diagnostic.Logger
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
+import groovy.swing.SwingBuilder
+import javax.swing.event.TableModelListener
 
 class ClaConfigurator {
   private final Logger log = Logger.getInstance(getClass())
 
   JPanel panel
-  TablePanel table;
+  TablePanel tablePanel
   SbtChangelistActionGComponent projectComponent
 
   ClaConfigurator(SbtChangelistActionGComponent projectComponent) {
@@ -44,32 +47,39 @@ class ClaConfigurator {
   }
 
   private void createComponents() {
-    table = new TablePanel(projectComponent).init()
+    tablePanel = new TablePanel(projectComponent).init()
     panel = new JPanel(new BorderLayout())
   }
 
   private void layoutComponents(){
-    panel.add(table.panel, BorderLayout.CENTER)
+    panel.add(tablePanel.panel, BorderLayout.CENTER)
   }
-
 
   void updateConfiguratorFromState(ClaState caState) {
-    table.commands.clear();
-    table.commands.addAll(caState.commands);
+    tablePanel.commands.clear()
+    tablePanel.commands.addAll(caState.commands)
   }
+
+
+
+  public boolean isConfigEquals(ClaState state) {
+    return state.commands.equals(tablePanel.commands)
+  }
+
 }
 
 class TablePanel {
   private final Logger log = Logger.getInstance(getClass())
 
   private static String[] columnLabels = [
-    "Name"] //, "Class Pattern", "Description"];
+    "Name", "Command", "Options"]
   private static String[] columnProps = [
-    "name"] //, "classMatchPattern", "description"];
+    "name", "command", "options"]
 
   SbtChangelistActionGComponent projectComponent
   JPanel panel
   EventList<ClaCommand> commands
+
   JBTable table
   JBScrollPane tableScollPane
   JButton addButton
@@ -96,24 +106,27 @@ class TablePanel {
       "top:pref");
 
     ButtonStackBuilder buttonBuilder = new ButtonStackBuilder();
-    buttonBuilder.addGridded(addButton);
-    buttonBuilder.addRelatedGap();
-    buttonBuilder.addGridded(editButton);
-    buttonBuilder.addRelatedGap();
-    buttonBuilder.addGridded(removeButton);
-    buttonBuilder.addRelatedGap();
-    buttonBuilder.addGridded(moveUpButton);
-    buttonBuilder.addRelatedGap();
-    buttonBuilder.addGridded(moveDownButton);
+    [addButton, editButton, removeButton, moveUpButton, moveDownButton].each{
+      button ->
+        buttonBuilder.addGridded(button);
+        buttonBuilder.addRelatedGap();
+    }
+//    buttonBuilder.addGridded(addButton);
+//    buttonBuilder.addRelatedGap();
+//    buttonBuilder.addGridded(editButton);
+//    buttonBuilder.addRelatedGap();
+//    buttonBuilder.addGridded(removeButton);
+//    buttonBuilder.addRelatedGap();
+//    buttonBuilder.addGridded(moveUpButton);
+//    buttonBuilder.addRelatedGap();
+//    buttonBuilder.addGridded(moveDownButton);
 
     panel.setLayout(layout)
     CellConstraints cc = new CellConstraints();
     panel.add(tableScollPane, cc.xy(1, 1));
-//    containerPanel.add(buttonBuilder.getPanel(), cc.xy(3, 1));
     panel.add(buttonBuilder.panel, cc.xy(3, 1));
 
 
-//    panel.add(new JLabel("table stuff goes goes here"))
   }
 
   private JButton createButton(String text, int key){
@@ -127,32 +140,24 @@ class TablePanel {
 
     panel = new JPanel()
 
-//    swing.button(){text = "Add..."; mnemonic = KeyEvent.VK_A}
-//    swing.button(text:"Add...", mnemonic: KeyEvent.VK_A)
-
-    addButton = createButton("Add...", KeyEvent.VK_A);
-    addButton.actionPerformed = {
-      log.debug("project: $projectComponent")
-
-      ClaCommandConfigurator editForm =
-        new ClaCommandConfigurator().init();
-
-      boolean okButtonPressed =
-        editForm.showAsIdeaDialog(this.projectComponent.project, "Add renderer");
-      if( okButtonPressed ){
-        commands.add([
-          name: editForm.name.text,
-          command: editForm.command.text,
-          options: editForm.options.text] as ClaCommand );
-        selectedRow = table.getRowCount()-1;
-      }
-
-    }
-
-    editButton = createButton("Edit...", KeyEvent.VK_E);
-    removeButton = createButton("Remove", KeyEvent.VK_R);
-    moveUpButton = createButton("Move Up", KeyEvent.VK_U);
-    moveDownButton = createButton("Move Down", KeyEvent.VK_D);
+    addButton = swing.button(
+      text: "Add...", mnemonic: KeyEvent.VK_A, actionPerformed: {addRow()} )
+    editButton = swing.button(
+      text: "Edit...",
+      mnemonic: KeyEvent.VK_E,
+      actionPerformed: {editSelectedRow()} )
+    removeButton = swing.button(
+      text: "Remove",
+      mnemonic: KeyEvent.VK_R,
+      actionPerformed: {this.removeSelectedRow()} )
+    moveUpButton = swing.button(
+      text: "Move Up",
+      mnemonic: KeyEvent.VK_U,
+      actionPerformed: {moveSelectedRow(-1)} )
+    moveDownButton = swing.button(
+      text: "Move Down",
+      mnemonic: KeyEvent.VK_D,
+      actionPerformed: {moveSelectedRow(+1)} )
     [editButton, removeButton, moveUpButton, moveDownButton]*.setEnabled(false)
 
     table = createTable(commands)
@@ -165,25 +170,70 @@ class TablePanel {
     table.selectionModel.valueChanged =
       { if(!it.valueIsAdjusting) adjustButtonEnablement() }
     table.mouseClicked = { if(it.getClickCount() == 2) editSelectedRow() }
+  }
 
-//    table.model.addTableModelListener(
-//      { adjustButtonEnablement() } as TableModelListener )
-//    table.selectionModel.addListSelectionListener({
-//      if(!it.valueIsAdjusting) adjustButtonEnablement()
-//    } as ListSelectionListener)
+  private moveSelectedRow(int movement) {
+    int selectedRow = table.selectedRow
+    ClaCommand cmd = commands.remove(selectedRow);
+    commands.add(selectedRow + movement, cmd);
+    setSelectedRow(selectedRow + movement)
+  }
 
+  private addRow() {
+    ClaCommandConfigurator editForm =
+      new ClaCommandConfigurator().init()
+    boolean okButtonPressed =
+      editForm.showAsIdeaDialog(this.projectComponent.project, "Add renderer")
 
-//    table.addMouseListener(
-//      new MouseAdapter() {
-//        public void mouseClicked(MouseEvent e) {
-//          if(e.getClickCount() == 2) editSelectedRow()
-//        }
-//      }
-//    )
+    if (okButtonPressed) {
+      ClaCommand cmd = new ClaCommand()
+      editForm.updateObjectFromPanelFields(cmd)
+      commands.add(cmd)
+      selectedRow = table.rowCount - 1
+    }
+  }
 
+  private removeSelectedRow() {
+    if (table.selectionModel.isSelectionEmpty()) {
+      return
+    }
+
+    commands.remove(table.selectedRow);
+
+    // select the row below the old removed one
+    if (!commands.isEmpty()) {
+      int lastRow = table.rowCount - 1
+      if (table.selectedRow < lastRow) {
+        setSelectedRow(table.selectedRow);
+      }
+      else {
+        setSelectedRow(lastRow);
+      }
+    }
   }
 
   void editSelectedRow() {
+    if( table.selectionModel.selectionEmpty ){
+      return
+    }
+
+    int selectedRow = table.selectedRow;
+
+    ClaCommandConfigurator editForm = new ClaCommandConfigurator().init();
+    editForm.updatePanelFieldsFromObject(commands.get(selectedRow));
+
+    boolean userPressedOk =
+      editForm.showAsIdeaDialog(projectComponent.project, "Edit command");
+    if( userPressedOk ){
+      // we use a new object so that comparing the list from the project state
+      // and the table list  (for "isModified") will come up with false in
+      // the case of a single command being edited
+      ClaCommand cmd = new ClaCommand()
+      editForm.updateObjectFromPanelFields(cmd);
+      commands.set(selectedRow, cmd);
+
+      editForm.updateObjectFromPanelFields(cmd);
+    }
 
   }
 
@@ -228,7 +278,5 @@ class TablePanel {
       moveDownButton.setEnabled(table.getSelectedRow() < table.getRowCount()-1)
     }
   }
-
-
 
 }

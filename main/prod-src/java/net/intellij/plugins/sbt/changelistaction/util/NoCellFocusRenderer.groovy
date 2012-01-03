@@ -1,4 +1,4 @@
-package net.intellij.plugins.changelistaction.util
+package net.intellij.plugins.sbt.changelistaction.util
 
 
 import javax.swing.*;

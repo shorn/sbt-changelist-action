@@ -1,18 +1,17 @@
-package net.intellij.plugins.changelistaction.config
+package net.intellij.plugins.sbt.changelistaction.config
 
 import javax.swing.JTextField
 import javax.swing.JPanel
 import com.jgoodies.forms.layout.FormLayout
 import com.jgoodies.forms.layout.CellConstraints
 import javax.swing.JLabel
-import com.intellij.openapi.ui.FixedSizeButton
+
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
-import java.awt.Window
+
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.project.Project
 import javax.swing.JComponent
-import net.intellij.plugins.changelistaction.ClaCommand
-import static com.intellij.openapi.ui.TextFieldWithBrowseButton.*
+import net.intellij.plugins.sbt.changelistaction.ClaCommand
 
 class ClaCommandConfigurator {
   
@@ -32,13 +31,8 @@ class ClaCommandConfigurator {
     panel = new JPanel()
     name = new JTextField()
     command = new JTextField()
-//    commandButton = new FixedSizeButton(command)
     options = new JTextField()
     commandButton = new TextFieldWithBrowseButton(command)
-
-//    new TextFieldWithBrowseButton .MyDoClickAction(commandButton).registerShortcut(command);
-
-//    TextFieldWithBrowseButton.MyDoClickAction.addTo(commandButton, command)
   }
 
   void layoutComponents(){
@@ -57,13 +51,17 @@ class ClaCommandConfigurator {
     panel.add(options, cc.xy(2, 3))
   }
 
-  void updateEditPanelFields(ClaCommand c) {
+  void updatePanelFieldsFromObject(ClaCommand c) {
     name.text = c.name
+    command.text = c.command
+    options.text = c.options
   }
 
 
-  void updateRenderConfigProperties(ClaCommand c) {
-    c.setName(name.text)
+  void updateObjectFromPanelFields(ClaCommand c) {
+    c.name = name.text
+    c.command = command.text
+    c.options = options.text
   }
 
   /**
