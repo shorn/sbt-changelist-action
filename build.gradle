@@ -1,0 +1,50 @@
+
+mountDir = System.getProperty("mountDir", "../sbt-changelist-action-mnt")
+
+osxRamdiskName = System.getProperty("osxRamdiskName", "ramdisk")
+osxRamdiskDir = System.getProperty("osxRamdiskDir","/Volumes/$osxRamdiskName")
+osxRamdiskSize = System.getProperty("osxRamdiskSize", "1024000")
+
+task setupMountDir << {
+  File mountFile = new File(mountDir)
+  if( mountFile.exists() ){
+    println "can't mountFile a ramdisk to [$mountFile.absoluteFile], a file of that name already exists"
+    return
+  }
+
+  File ramdiskFile = new File(osxRamdiskDir)
+  if( ramdiskFile.exists() ){
+    println "can't create a ramdisk, [$ramdiskFile.absoluteFile] already exists"
+  }
+
+  
+
+  exec(){
+    commandLine = [
+      "/usr/sbin/diskutil",
+      "erasevolume",
+      "HFS+",
+      osxRamdiskName,
+      "`hdiutil attach -nomount ram://$osxRamdiskSize`" ]
+  }
+
+  exec() {
+    commandLine = ["/bin/link", "-s", osxRamdiskDir, mountFile.absoluteFile]
+  }
+
+}
+
+task cleanMountDir << {
+  delete mountDir
+}
+
+//task makeDir(type: Exec)  {
+//  File mount = new File(mountDir)
+//  if( mount.exists() ){
+//    println "mnt dir already exists"
+//    throw new StopExecutionException("mount dir already exists")
+//  }
+//  println "creating mount dir: $mount.absoluteFile"
+//  commandLine = ["/bin/mkdir", "$mount.absoluteFile"]
+//}
+//
