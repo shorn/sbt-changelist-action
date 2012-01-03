@@ -5,6 +5,17 @@ osxRamdiskName = System.getProperty("osxRamdiskName", "ramdisk")
 osxRamdiskDir = System.getProperty("osxRamdiskDir","/Volumes/$osxRamdiskName")
 osxRamdiskSize = System.getProperty("osxRamdiskSize", "1024000")
 
+task testBlah << {
+
+
+  def result = exec{
+    commandLine = ["/bin/echo", "wibble"]
+    standardOutput = out
+  }
+  println "result: ${result.inspect()}"
+  println "result: ${out.toString()}"
+}
+
 task setupMountDir << {
   File mountFile = new File(mountDir)
   if( mountFile.exists() ){
@@ -17,7 +28,15 @@ task setupMountDir << {
     println "can't create a ramdisk, [$ramdiskFile.absoluteFile] already exists"
   }
 
-  
+  def attachResult = new ByteArrayOutputStream()
+  exec(){
+    commandLine = [
+      "/usr/bin/hdiutil",
+      "attach",
+      "-nomount",
+      "ram://$osxRamdiskSize" ]
+    standardOutput = attachResult
+  }
 
   exec(){
     commandLine = [
@@ -25,7 +44,7 @@ task setupMountDir << {
       "erasevolume",
       "HFS+",
       osxRamdiskName,
-      "`hdiutil attach -nomount ram://$osxRamdiskSize`" ]
+      attachResult.toString() ]
   }
 
   exec() {

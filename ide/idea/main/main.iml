@@ -22,6 +22,7 @@
         </SOURCES>
       </library>
     </orderEntry>
+    <orderEntry type="library" scope="PROVIDED" name="gradle-cli-1.0-milestone-6" level="application" />
   </component>
 </module>
 
