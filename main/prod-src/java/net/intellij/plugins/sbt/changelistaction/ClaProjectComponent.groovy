@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project
 
 import javax.swing.JComponent
 import com.intellij.openapi.diagnostic.Logger
-import net.intellij.plugins.sbt.changelistaction.config.ClaConfigurator
+
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -20,16 +20,17 @@ import javax.swing.Icon
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.util.xmlb.XmlSerializerUtil
+import net.intellij.plugins.sbt.changelistaction.config.ClaProjectConfigurator
 
 @State(
-  name = SbtChangelistActionGComponent.COMPONENT_NAME,
+  name = ClaProjectComponent.COMPONENT_NAME,
   storages = [
     @Storage(id = "sbt-changelist-action-default", file = '$PROJECT_FILE$'),
     @Storage(
      id = "sbt-changelist-action-dir",
      file = '$PROJECT_CONFIG_DIR$/sbt-changelist-action.xml',
      scheme = StorageScheme.DIRECTORY_BASED )])
-class SbtChangelistActionGComponent
+class ClaProjectComponent
 implements
   Configurable,
   ProjectComponent,
@@ -40,12 +41,11 @@ implements
   private final Logger log = Logger.getInstance(getClass())
 
   Project project
-  ClaConfigurator configurator;
+  ClaProjectConfigurator configurator;
   Icon pluginIcon;
 
-  SbtChangelistActionGComponent(Project project) {
+  ClaProjectComponent(Project project) {
     super()
-    println "ctor!!!!"
     this.project = project
   }
 
@@ -89,7 +89,7 @@ implements
     log.debug "createComponent() - $project.name"
 
     if( configurator == null ){
-      configurator = new ClaConfigurator(this).init()
+      configurator = new ClaProjectConfigurator(this).init()
       configurator.updateConfiguratorFromState(this.state)
     }
 

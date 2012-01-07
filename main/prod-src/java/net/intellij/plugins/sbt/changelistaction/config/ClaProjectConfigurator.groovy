@@ -22,25 +22,23 @@ import java.awt.event.KeyEvent
 
 import net.intellij.plugins.sbt.changelistaction.ClaState
 import net.intellij.plugins.sbt.changelistaction.ClaCommand
-import net.intellij.plugins.sbt.changelistaction.SbtChangelistActionGComponent
+import net.intellij.plugins.sbt.changelistaction.ClaProjectComponent
 import com.intellij.openapi.diagnostic.Logger
-import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
-import groovy.swing.SwingBuilder
-import javax.swing.event.TableModelListener
 
-class ClaConfigurator {
+import groovy.swing.SwingBuilder
+
+class ClaProjectConfigurator {
   private final Logger log = Logger.getInstance(getClass())
 
   JPanel panel
   TablePanel tablePanel
-  SbtChangelistActionGComponent projectComponent
+  ClaProjectComponent projectComponent
 
-  ClaConfigurator(SbtChangelistActionGComponent projectComponent) {
+  ClaProjectConfigurator(ClaProjectComponent projectComponent) {
     this.projectComponent = projectComponent
   }
 
-  ClaConfigurator init() {
+  ClaProjectConfigurator init() {
     createComponents()
     layoutComponents()
     return this
@@ -76,7 +74,7 @@ class TablePanel {
   private static String[] columnProps = [
     "name", "command", "options"]
 
-  SbtChangelistActionGComponent projectComponent
+  ClaProjectComponent projectComponent
   JPanel panel
   EventList<ClaCommand> commands
 
@@ -88,7 +86,7 @@ class TablePanel {
   JButton moveUpButton
   JButton moveDownButton
 
-  TablePanel(SbtChangelistActionGComponent projectComponent) {
+  TablePanel(ClaProjectComponent projectComponent) {
     this.projectComponent = projectComponent
     commands = GlazedLists.threadSafeList(
       new BasicEventList<ClaCommand>() )

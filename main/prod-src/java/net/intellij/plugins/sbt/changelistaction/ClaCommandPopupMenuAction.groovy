@@ -6,11 +6,11 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import net.intellij.plugins.sbt.changelistaction.util.ClaUtil
 
 class ClaCommandPopupMenuAction extends AnAction {
-  private SbtChangelistActionGComponent projectComponent
+  private ClaProjectComponent projectComponent
   private ClaCommand command;
 
   ClaCommandPopupMenuAction(
-    SbtChangelistActionGComponent projectComponent,
+    ClaProjectComponent projectComponent,
     ClaCommand iCommand)
   {
     super(

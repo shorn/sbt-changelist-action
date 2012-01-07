@@ -15,7 +15,7 @@
   <project-components>
     <component>
       <implementation-class>
-        net.intellij.plugins.sbt.changelistaction.SbtChangelistActionGComponent
+        net.intellij.plugins.sbt.changelistaction.ClaProjectComponent
       </implementation-class>
     </component>
   </project-components>

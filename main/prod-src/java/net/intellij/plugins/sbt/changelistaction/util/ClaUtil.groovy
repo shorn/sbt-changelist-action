@@ -2,7 +2,7 @@ package net.intellij.plugins.sbt.changelistaction.util
 
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.ActionManager
-import net.intellij.plugins.sbt.changelistaction.SbtChangelistActionGComponent
+import net.intellij.plugins.sbt.changelistaction.ClaProjectComponent
 import javax.swing.Icon
 import com.intellij.openapi.util.IconLoader
 
@@ -24,7 +24,7 @@ class ClaUtil {
    * prefix.
    */
   static String getClActionIdPrefix() {
-    return SbtChangelistActionGComponent.name
+    return ClaProjectComponent.name
   }
 
   public static String formatClActionId(String name){
