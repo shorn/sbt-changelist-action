@@ -181,9 +181,9 @@ class TablePanel {
 
   private addRow() {
     ClaCommandConfigurator editForm =
-      new ClaCommandConfigurator().init()
+      new ClaCommandConfigurator(this.projectComponent.project).init()
     boolean okButtonPressed =
-      editForm.showAsIdeaDialog(this.projectComponent.project, "Add renderer")
+      editForm.showAsIdeaDialog("Add renderer")
 
     if (okButtonPressed) {
       ClaCommand cmd = new ClaCommand()
@@ -219,11 +219,12 @@ class TablePanel {
 
     int selectedRow = table.selectedRow;
 
-    ClaCommandConfigurator editForm = new ClaCommandConfigurator().init();
+    ClaCommandConfigurator editForm =
+      new ClaCommandConfigurator(this.projectComponent.project).init();
     editForm.updatePanelFieldsFromObject(commands.get(selectedRow));
 
     boolean userPressedOk =
-      editForm.showAsIdeaDialog(projectComponent.project, "Edit command");
+      editForm.showAsIdeaDialog("Edit command");
     if( userPressedOk ){
       // we use a new object so that comparing the list from the project state
       // and the table list  (for "isModified") will come up with false in

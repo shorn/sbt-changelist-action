@@ -31,10 +31,7 @@ task setupMountDir << {
   def attachResult = new ByteArrayOutputStream()
   exec(){
     commandLine = [
-      "/usr/bin/hdiutil",
-      "attach",
-      "-nomount",
-      "ram://$osxRamdiskSize" ]
+      "/usr/bin/hdiutil", "attach", "-nomount", "ram://$osxRamdiskSize" ]
     standardOutput = attachResult
   }
 
@@ -57,13 +54,3 @@ task cleanMountDir << {
   delete mountDir
 }
 
-//task makeDir(type: Exec)  {
-//  File mount = new File(mountDir)
-//  if( mount.exists() ){
-//    println "mnt dir already exists"
-//    throw new StopExecutionException("mount dir already exists")
-//  }
-//  println "creating mount dir: $mount.absoluteFile"
-//  commandLine = ["/bin/mkdir", "$mount.absoluteFile"]
-//}
-//

@@ -12,15 +12,23 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.project.Project
 import javax.swing.JComponent
 import net.intellij.plugins.sbt.changelistaction.ClaCommand
+import java.awt.Dimension
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 
 class ClaCommandConfigurator {
   
+  Project project
+
   JPanel panel
   JTextField name
   JTextField command
   JTextField options
   TextFieldWithBrowseButton commandButton
 
+  ClaCommandConfigurator(Project project){
+    this.project = project;
+  }
+  
   ClaCommandConfigurator init(){
     createComponents()
     layoutComponents()
@@ -33,11 +41,16 @@ class ClaCommandConfigurator {
     command = new JTextField()
     options = new JTextField()
     commandButton = new TextFieldWithBrowseButton(command)
+    commandButton.addBrowseFolderListener(
+      "thetitle",
+      "thedesc",
+      project,
+      FileChooserDescriptorFactory.createSingleFileDescriptor(null))
   }
 
   void layoutComponents(){
     FormLayout layout = new FormLayout(
-      "pref, min(200dlu;pref):grow, pref",
+      "pref, max(200dlu;pref):grow, pref",
       "default, default, default")
     panel.setLayout(layout)
     CellConstraints cc = new CellConstraints()
@@ -49,6 +62,10 @@ class ClaCommandConfigurator {
     panel.add(commandButton, cc.xy(3, 2))
     panel.add(new JLabel("Option:"), cc.xy(1, 3))
     panel.add(options, cc.xy(2, 3))
+
+//    options.setColumns(30)
+//    options.setPreferredSize(options.getPreferredSize().set)
+
   }
 
   void updatePanelFieldsFromObject(ClaCommand c) {
@@ -68,8 +85,10 @@ class ClaCommandConfigurator {
    * show the edit dialog as a blocking modal popup
    * @return true if user pressed ok button
    */
-  boolean showAsIdeaDialog(Project project, String title){
+  boolean showAsIdeaDialog(String title){
     DialogWrapper dialogWrapper = new IdeaDialogWrapper(project, title);
+
+    dialogWrapper.setResizable(true)
 
     dialogWrapper.pack();
     dialogWrapper.show();
@@ -81,6 +100,7 @@ class ClaCommandConfigurator {
     private IdeaDialogWrapper(Project project, String title) {
       super(project, true);
       this.setTitle(title);
+
       init();
     }
 
