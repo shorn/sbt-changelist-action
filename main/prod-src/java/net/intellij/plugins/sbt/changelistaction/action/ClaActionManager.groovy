@@ -16,9 +16,12 @@ class ClaActionManager {
 
   List<ClaCommandPopupMenuAction> actions = []
 
-  ClaActionManager(ClaProjectComponent projectComponent) {
+  ClaActionManager(
+    ClaProjectComponent projectComponent,
+    ActionManager actionManager)
+  {
     this.projectComponent = projectComponent
-    this.actionManager = ActionManager.getInstance();
+    this.actionManager = actionManager
     this.actionGroup = getChangesViewMenuActionGroup(this.actionManager)
   }
 
@@ -54,10 +57,6 @@ class ClaActionManager {
    }
 
    actions.clear()
-//    actionManager.getActionIds(getClActionIdPrefix()).each { clActionId ->
-//      actionGroup.remove(actionManager.getAction(clActionId))
-//      actionManager.unregisterAction(clActionId)
-//    }
   }
 
   void addClActions(List<ClaCommand> commands) {

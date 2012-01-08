@@ -15,6 +15,7 @@ import javax.swing.JComponent
 import net.intellij.plugins.sbt.changelistaction.config.ClaProjectConfigurator
 import net.intellij.plugins.sbt.changelistaction.util.ClaUtil
 import net.intellij.plugins.sbt.changelistaction.action.ClaActionManager
+import com.intellij.openapi.actionSystem.ActionManager
 
 @State(
   name = ClaProjectComponent.COMPONENT_NAME,
@@ -43,19 +44,17 @@ implements
   ClaProjectComponent(Project project) {
     super()
     this.project = project
-    this.actionManager = new ClaActionManager(this)
+    this.actionManager = new ClaActionManager(this, ActionManager.getInstance())
   }
 
 
   // ---------- ProjectComponent ----------
 
-  @Override
   void projectOpened() {
     log.debug "projectOpened() - $project.name"
     actionManager.addClActions(state.commands)
   }
 
-  @Override
   void projectClosed() {
     log.debug "projectClosed() - $project.name"
     actionManager.removeClActions()
@@ -72,7 +71,7 @@ implements
 
   @Override
   void initComponent() {
-    log.debug "initComponent() - $project.name [P${project.hashCode()}] [C${this.hashCode()}]"
+    log.debug "initComponent() - $project.name [P${project.hashCode()}] [PC${this.hashCode()}]"
   }
 
   @Override
@@ -117,7 +116,6 @@ implements
    */
   boolean isModified() {
     boolean modified = !configurator.isConfigEquals(state)
-    log.debug "isModified() for $project.name returned $modified"
     return modified
   }
 
