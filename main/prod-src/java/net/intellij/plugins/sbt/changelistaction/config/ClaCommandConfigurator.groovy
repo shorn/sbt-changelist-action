@@ -85,11 +85,8 @@ class ClaCommandConfigurator {
       new JLabel(
         text: "Clear console:",
         toolTipText: "Clear the console before the command is executed" ),
-      cc.xy(1, 5))
+      cc.xy(1, 5) )
     panel.add(console, cc.xy(2, 5))
-
-
-
   }
 
   void updatePanelFieldsFromObject(ClaCommand c) {
@@ -97,7 +94,6 @@ class ClaCommandConfigurator {
     command.text = c.command
     options.text = c.options
     filePaths.selectedItem = c.filenames
-    log.warn "update - $c.clearConsole"
     console.selected = c.clearConsole
   }
 

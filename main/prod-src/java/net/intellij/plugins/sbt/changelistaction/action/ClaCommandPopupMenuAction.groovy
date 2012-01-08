@@ -1,24 +1,29 @@
-package net.intellij.plugins.sbt.changelistaction
+package net.intellij.plugins.sbt.changelistaction.action
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 
 import net.intellij.plugins.sbt.changelistaction.util.ClaUtil
+import net.intellij.plugins.sbt.changelistaction.ClaProjectComponent
+import net.intellij.plugins.sbt.changelistaction.ClaCommand
 
 class ClaCommandPopupMenuAction extends AnAction {
-  private ClaProjectComponent projectComponent
-  private ClaCommand command;
+  ClaProjectComponent projectComponent
+  ClaCommand command;
+  String id
 
   ClaCommandPopupMenuAction(
     ClaProjectComponent projectComponent,
-    ClaCommand iCommand)
+    ClaCommand iCommand,
+    String id)
   {
     super(
       iCommand.name,
       "",  // description
-      ClaUtil.getIcon16())
-    this.projectComponent = projectComponent;
-    this.command = iCommand;
+      ClaUtil.getIcon16() )
+    this.projectComponent = projectComponent
+    this.command = iCommand
+    this.id = id
 
     // overwrite the description set in the ctor call coz we couldn't call
     // the format method from there
