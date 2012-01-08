@@ -12,11 +12,16 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.project.Project
 import javax.swing.JComponent
 import net.intellij.plugins.sbt.changelistaction.ClaCommand
-import java.awt.Dimension
+
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import javax.swing.JCheckBox
+import javax.swing.JComboBox
+import net.intellij.plugins.sbt.changelistaction.util.SimpleComboRenderer
+import com.intellij.openapi.diagnostic.Logger
 
 class ClaCommandConfigurator {
-  
+  private final Logger log = Logger.getInstance(getClass())
+
   Project project
 
   JPanel panel
@@ -24,6 +29,8 @@ class ClaCommandConfigurator {
   JTextField command
   JTextField options
   TextFieldWithBrowseButton commandButton
+  JComboBox filePaths
+  JCheckBox console
 
   ClaCommandConfigurator(Project project){
     this.project = project;
@@ -46,12 +53,22 @@ class ClaCommandConfigurator {
       "thedesc",
       project,
       FileChooserDescriptorFactory.createSingleFileDescriptor(null))
+
+    filePaths = new JComboBox(ClaCommand.PathFormat.enumConstants)
+    
+    filePaths.setRenderer(new SimpleComboRenderer<ClaCommand.PathFormat>(){
+      String getNonNullString(ClaCommand.PathFormat value) {
+        return value.description
+      }
+    })
+
+    console = new JCheckBox(selected: true)
   }
 
   void layoutComponents(){
     FormLayout layout = new FormLayout(
       "pref, max(200dlu;pref):grow, pref",
-      "default, default, default")
+      "default, default, default, default, default")
     panel.setLayout(layout)
     CellConstraints cc = new CellConstraints()
 
@@ -62,9 +79,16 @@ class ClaCommandConfigurator {
     panel.add(commandButton, cc.xy(3, 2))
     panel.add(new JLabel("Option:"), cc.xy(1, 3))
     panel.add(options, cc.xy(2, 3))
+    panel.add(new JLabel("Filenames:"), cc.xy(1, 4))
+    panel.add(filePaths, cc.xy(2, 4))
+    panel.add(
+      new JLabel(
+        text: "Clear console:",
+        toolTipText: "Clear the console before the command is executed" ),
+      cc.xy(1, 5))
+    panel.add(console, cc.xy(2, 5))
 
-//    options.setColumns(30)
-//    options.setPreferredSize(options.getPreferredSize().set)
+
 
   }
 
@@ -72,6 +96,9 @@ class ClaCommandConfigurator {
     name.text = c.name
     command.text = c.command
     options.text = c.options
+    filePaths.selectedItem = c.filenames
+    log.warn "update - $c.clearConsole"
+    console.selected = c.clearConsole
   }
 
 
@@ -79,6 +106,8 @@ class ClaCommandConfigurator {
     c.name = name.text
     c.command = command.text
     c.options = options.text
+    c.filenames = filePaths.selectedItem as ClaCommand.PathFormat
+    c.clearConsole = console.selected
   }
 
   /**

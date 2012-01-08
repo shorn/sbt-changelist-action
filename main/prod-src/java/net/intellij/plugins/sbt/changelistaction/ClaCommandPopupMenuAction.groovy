@@ -50,7 +50,7 @@ class ClaCommandPopupMenuAction extends AnAction {
 //        ChangelistUtil.getChangelistFiles(iChangeList),
 //        formatCommandWithOptions(),
 //        projectComponent.getState().absolutePath,
-//        projectComponent.getState().consoleOutput);
+//        projectComponent.getState().clearConsole);
 //    }
 
   }

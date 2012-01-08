@@ -216,11 +216,23 @@ class ClaState {
 
 
 class ClaCommand {
-  String absolutePath
-  String consoleOutput
+  PathFormat filenames
+  boolean clearConsole
   String name
   String command
   String options
+
+  static enum PathFormat {
+    ABSOLUTE("Absolute"), RELATIVE("Relative");
+
+    String description
+
+    PathFormat(String description) {
+      this.description = description
+    }
+
+
+  }
 }
 
 
