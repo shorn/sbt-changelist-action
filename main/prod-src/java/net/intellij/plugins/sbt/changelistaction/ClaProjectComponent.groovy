@@ -16,6 +16,10 @@ import net.intellij.plugins.sbt.changelistaction.config.ClaProjectConfigurator
 import net.intellij.plugins.sbt.changelistaction.util.ClaUtil
 import net.intellij.plugins.sbt.changelistaction.action.ClaActionManager
 import com.intellij.openapi.actionSystem.ActionManager
+import net.intellij.plugins.sbt.changelistaction.action.ClaCommandExecutionManager
+import com.intellij.openapi.application.Application
+import com.intellij.openapi.actionSystem.DataConstants
+import com.intellij.openapi.application.ApplicationManager
 
 @State(
   name = ClaProjectComponent.COMPONENT_NAME,
@@ -31,27 +35,36 @@ implements
   ProjectComponent,
   PersistentStateComponent<ClaState>
 {
-  public static final String COMPONENT_NAME = "SBT VCS Changelist Action";
+  public static final String COMPONENT_NAME = "ClaProjectComponent";
 
   private final Logger log = Logger.getInstance(getClass())
 
+  // ctor
   Project project
-  ClaActionManager actionManager
+  ClaApplicationComponent appliationComponent
 
+  // project opened
+  ClaActionManager actionManager
+  ClaCommandExecutionManager executionManager
+
+  // lazy init
   ClaProjectConfigurator configurator
 
 
   ClaProjectComponent(Project project) {
     super()
     this.project = project
-    this.actionManager = new ClaActionManager(this, ActionManager.getInstance())
+    appliationComponent =
+      ApplicationManager.getApplication().getComponent(ClaApplicationComponent)
   }
 
 
   // ---------- ProjectComponent ----------
 
   void projectOpened() {
-    log.debug "projectOpened() - $project.name"
+    log.debug "projectOpened() ${Thread.currentThread().name} - $project.name"
+    actionManager = new ClaActionManager(this, ActionManager.getInstance())
+    executionManager = new ClaCommandExecutionManager(this)
     actionManager.addClActions(state.commands)
   }
 
@@ -71,7 +84,7 @@ implements
 
   @Override
   void initComponent() {
-    log.debug "initComponent() - $project.name [P${project.hashCode()}] [PC${this.hashCode()}]"
+    log.debug "initComponent() ${Thread.currentThread().name} - $project.name [P${project.hashCode()}] [PC${this.hashCode()}]"
   }
 
   @Override

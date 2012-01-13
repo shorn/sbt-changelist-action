@@ -10,6 +10,11 @@
   <idea-version since-build="8000"/>
 
   <application-components>
+    <component>
+      <implementation-class>
+        net.intellij.plugins.sbt.changelistaction.ClaApplicationComponent
+      </implementation-class>
+    </component>
   </application-components>
 
   <project-components>

@@ -32,6 +32,9 @@ class ClaCommandPopupMenuAction extends AnAction {
 
   @Override
   public void actionPerformed(AnActionEvent e) {
+    projectComponent.executionManager.execute(formatCommandWithOptions())
+
+
 //    DataContext dataContext = e.getDataContext();
 //    Project project = DataKeys.PROJECT.getData(dataContext);
 
