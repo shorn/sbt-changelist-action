@@ -66,16 +66,14 @@ class ClaCommandConfigurator {
   }
 
   /**
-   * need to improve the dialog layout a little - atm, it has a minimum width
-   * but no maximum, which looks crap for really long commands, which is really
-   * easy to do on OS's like OSX.
-   * Also, it coudl probably use a resize when the command does exceed the
-   * current dialog width.  minor stuff really but it bugs me when I'm using
-   * it.
+   * The "600dlu" max for the middle column could probably use a better value,
+   * maybe make sure the dialog is not wider than the display or something?
+   * Note that the [X, Y, Z] colspec requires a recent version of formlayout
+   * - more recent than the one packaged with IDEA at least.
    */
   void layoutComponents(){
     FormLayout layout = new FormLayout(
-      "pref, max(200dlu;pref):grow, pref",
+      "pref, [200dlu,pref,600dlu]:grow, pref",
       "default, default, default, default, default")
     panel.setLayout(layout)
     CellConstraints cc = new CellConstraints()
