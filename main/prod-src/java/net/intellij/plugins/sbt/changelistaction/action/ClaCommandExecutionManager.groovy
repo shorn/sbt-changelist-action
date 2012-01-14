@@ -24,116 +24,134 @@ import com.intellij.execution.process.OSProcessHandler
 import com.intellij.openapi.diagnostic.Logger
 import groovy.swing.SwingBuilder
 import com.intellij.util.IJSwingUtilities
+import com.intellij.openapi.actionSystem.ActionToolbar
 
+/**
+ * The implementation of this class really sucks - I want the GUI widgets
+ * to be lazy (not exist until the first time a command is actually executed).
+ * The way getConsoleView() and createToolWindow() interact is just wrong.
+ * Maybe I should move the laziness - instead of making the GUI widgets
+ * lazy on this class, make them eager but make the creationg of this class
+ * itself lazy in the projectComponent?
+ * Problems with that approach:
+ * - handling the clsoing of the window button and disposing of the GUI widgets
+ * - handling showing the window
+ * - dealing with "re-execute last command" style functionality
+ * - I don't want to complicate the project component with details of
+ *   executing commands or GUI stuff
+ */
 class ClaCommandExecutionManager {
   private final Logger log = Logger.getInstance(getClass())
   private static String TOOL_WINDOW_ID = "CLA Console";
 
+  // ctor
   ClaProjectComponent projectComponent
 
-  ToolWindow toolWindow;
+  // lazy
   ConsoleView consoleView;
+  ToolWindow toolWindow;
+
+  // state for execute last command toolbar button
+  ClaCommandPopupMenuAction lastExecutedCommand
+
 
   ClaCommandExecutionManager(ClaProjectComponent projectComponent) {
-    log.warn "ClaCommandExecutionManager.ctor - ${Thread.currentThread().name} "
     this.projectComponent = projectComponent
-
-//    IJSwingUtilities.invoke{
-//      log.warn "doLater - ${Thread.currentThread().name} "
-//    }
   }
 
   ConsoleView getConsoleView(){
     if( consoleView == null ){
-      ToolWindowManager manager =
-        ToolWindowManager.getInstance(projectComponent.project);
-      toolWindow = manager.getToolWindow(TOOL_WINDOW_ID);
-      toolWindow = createToolWindow(manager, projectComponent.project);
-
-      TextConsoleBuilder builder =
-        TextConsoleBuilderFactory.getInstance().createBuilder(
-          projectComponent.project);
+      TextConsoleBuilder builder = TextConsoleBuilderFactory.getInstance().
+        createBuilder(projectComponent.project);
       consoleView = builder.getConsole();
+
+      toolWindow = toolWindowMgr.getToolWindow(TOOL_WINDOW_ID)
+      // createToolWindow() may call getConsoleView(), so it must
+      // not be called until after the console is assigned
+      toolWindow = createToolWindow()
+      toolWindow.show(null)
     }
+
     return consoleView
+  }
+
+  ToolWindowManager getToolWindowMgr(){
+    ToolWindowManager.getInstance(projectComponent.project);
   }
 
   void disposeOfConsole(){
     if( consoleView != null ){
+      consoleView.clear();
       consoleView.dispose();
       consoleView = null;
     }
+
+    if( toolWindow != null ){
+      toolWindowMgr.unregisterToolWindow(TOOL_WINDOW_ID)
+      toolWindow = null;
+    }
   }
 
-  private ToolWindow createToolWindow(
-    ToolWindowManager toolWindowManager,
-    Project project)
+  private ToolWindow createToolWindow() {
+    JComponent toolbarComponent = createToolbar().getComponent();
+    JComponent consoleViewComponent = consoleView.getComponent();
+
+    final JPanel panel = new JPanel(new BorderLayout());
+    panel.add(toolbarComponent, BorderLayout.WEST);
+
+    ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+    Content content = contentFactory.createContent(
+      consoleViewComponent, "", false);
+    panel.add(content.getComponent(), BorderLayout.CENTER);
+
+    ToolWindow window = registerToolWindow(toolWindowMgr, panel);
+    return window;
+  }
+
+  private ActionToolbar createToolbar()
   {
     DefaultActionGroup actionGroup = new DefaultActionGroup();
-//    actionGroup.add(new AnAction("Invoke changelist action",
-//      "Invoke previous user action on VCS changelist.",
-//      ClaUtil.getIcon16())
-//    {
-//      public void actionPerformed(AnActionEvent anActionEvent) {
-//        execute(command, project)
-//      }
-//    })
+    actionGroup.add(new AnAction("Invoke changelist action",
+      "Invoke previous user action on VCS changelist.",
+      ClaUtil.getIcon16())
+    {
+      public void actionPerformed(AnActionEvent anActionEvent) {
+        if( lastExecutedCommand != null ){
+          execute(lastExecutedCommand)
+        }
+      }
+    })
 
     actionGroup.add(
       new AnAction(
         "Clear console",
         "Clear console window.",
-        ClaUtil.getIcon("clear.png") )
-      {
+        ClaUtil.getIcon("clear.png")) {
         public void actionPerformed(AnActionEvent anActionEvent) {
-          getConsoleView().clear();
+          consoleView.clear();
         }
       }
     )
     actionGroup.add(new AnAction("Close",
       "Close Changelist Action window.",
-      IconLoader.getIcon("/actions/cancel.png") )
-    {
+      IconLoader.getIcon("/actions/cancel.png")) {
       public void actionPerformed(AnActionEvent anActionEvent) {
-        getConsoleView().clear();
-        toolWindowManager.unregisterToolWindow(TOOL_WINDOW_ID);
+        disposeOfConsole();
       }
     });
 
-    JComponent toolbar = ActionManager.getInstance().createActionToolbar(
-      ActionPlaces.UNKNOWN, actionGroup, false).getComponent();
-
-
-    final JPanel panel = new JPanel(new BorderLayout());
-    panel.add(toolbar, BorderLayout.WEST);
-
-    ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-    // t`odo:sbt see if "consoleView" will actually call the getter?
-    JComponent viewComponent = getConsoleView().getComponent();
-    Content content =
-      contentFactory.createContent(viewComponent, "", false);
-
-    panel.add(content.getComponent(), BorderLayout.CENTER);
-
-    ToolWindow window = registerToolWindow(toolWindowManager, panel);
-
-    window.show(null)
-    return window;
+    return ActionManager.getInstance().createActionToolbar(
+      ActionPlaces.UNKNOWN, actionGroup, false)
   }
 
   private static ToolWindow registerToolWindow(
-    final ToolWindowManager
-    toolWindowManager,
+    ToolWindowManager toolWindowManager,
     final JPanel panel)
   {
-    final ToolWindow window = toolWindowManager.registerToolWindow(
-      TOOL_WINDOW_ID,
-      true,
-      ToolWindowAnchor.BOTTOM);
-    final ContentFactory contentFactory =
-      ContentFactory.SERVICE.getInstance();
-
-    final Content content = contentFactory.createContent(panel, "", false);
+    ToolWindow window = toolWindowManager.registerToolWindow(
+      TOOL_WINDOW_ID, true, ToolWindowAnchor.BOTTOM)
+    ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+    Content content = contentFactory.createContent(panel, "", false);
 
     content.setCloseable(false);
 
@@ -147,13 +165,16 @@ class ClaCommandExecutionManager {
   /**
    * Executes command and show it in the console.
    */
-  public int execute(String command) {
-    try {
-      Runtime rt = Runtime.getRuntime();
-      log.warn "Invoking $command"
+  public int execute(ClaCommandPopupMenuAction command) {
+    lastExecutedCommand = command
+    Runtime rt = Runtime.getRuntime();
+    log.warn "Invoking $command"
 
-      Process proc = rt.exec(command);
-      OSProcessHandler handler = new OSProcessHandler(proc, command);
+    def stringCommand = command.formatCommandWithOptions()
+
+    try {
+      Process proc = rt.exec(stringCommand);
+      OSProcessHandler handler = new OSProcessHandler(proc, stringCommand);
       getConsoleView().attachToProcess(handler);
       handler.startNotify();
 

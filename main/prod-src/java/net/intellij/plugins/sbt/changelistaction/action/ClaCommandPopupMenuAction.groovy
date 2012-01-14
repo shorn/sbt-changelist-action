@@ -7,6 +7,11 @@ import net.intellij.plugins.sbt.changelistaction.util.ClaUtil
 import net.intellij.plugins.sbt.changelistaction.ClaProjectComponent
 import net.intellij.plugins.sbt.changelistaction.ClaCommand
 
+/**
+ * this needs work, need to separate the concept of command, popup and action.
+ * this conflates them all at the moment.  maybe see if i can come up with an
+ * elegant solution using groovy mixin/trait thingies?
+ */
 class ClaCommandPopupMenuAction extends AnAction {
   ClaProjectComponent projectComponent
   ClaCommand command;
@@ -32,7 +37,7 @@ class ClaCommandPopupMenuAction extends AnAction {
 
   @Override
   public void actionPerformed(AnActionEvent e) {
-    projectComponent.executionManager.execute(formatCommandWithOptions())
+    projectComponent.executionManager.execute(this)
 
 
 //    DataContext dataContext = e.getDataContext();
@@ -63,7 +68,7 @@ class ClaCommandPopupMenuAction extends AnAction {
 
   }
 
-  private String formatCommandWithOptions() {
+  String formatCommandWithOptions() {
     return "$command.command $command.options"
   }
 

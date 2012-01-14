@@ -2,6 +2,9 @@ package net.intellij.plugins.sbt.changelistaction
 
 import com.intellij.openapi.components.ApplicationComponent
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.application.Application
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.wm.ToolWindowManager
 
 class ClaApplicationComponent implements ApplicationComponent{
   public static final String COMPONENT_NAME = "ClaApplicationComponent"
@@ -10,7 +13,9 @@ class ClaApplicationComponent implements ApplicationComponent{
 
   @Override
   void initComponent() {
-    log.debug "initComponent() in the appComponent"
+    log.debug "initComponent() ${Thread.currentThread().name}"
+    ToolWindowManager toolWindowMgr = ApplicationManager.getApplication().getComponent(ToolWindowManager.class)
+    log.debug "initComponent() twm - ${toolWindowMgr}"
   }
 
   @Override

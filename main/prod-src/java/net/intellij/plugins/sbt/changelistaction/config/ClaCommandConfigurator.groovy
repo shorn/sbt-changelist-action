@@ -65,6 +65,14 @@ class ClaCommandConfigurator {
     console = new JCheckBox(selected: true)
   }
 
+  /**
+   * need to improve the dialog layout a little - atm, it has a minimum width
+   * but no maximum, which looks crap for really long commands, which is really
+   * easy to do on OS's like OSX.
+   * Also, it coudl probably use a resize when the command does exceed the
+   * current dialog width.  minor stuff really but it bugs me when I'm using
+   * it.
+   */
   void layoutComponents(){
     FormLayout layout = new FormLayout(
       "pref, max(200dlu;pref):grow, pref",

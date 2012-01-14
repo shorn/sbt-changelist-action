@@ -111,7 +111,7 @@ implements
   // ---------- Configurable ----------
 
   String getDisplayName() {
-    return COMPONENT_NAME
+    return "SBT Change List Action"
   }
 
   // need to hook up the help up to a wiki topic at some point

@@ -59,6 +59,18 @@ class ClaActionManager {
    actions.clear()
   }
 
+  /**
+   * Add command actions to changelist popup menu.
+   *
+   * These actions will show up in teh menu for ALL projects, which
+   * is sort of pointless (if you're right-clicking on a CL in one project
+   * why would you want to see the actions from a different project?)
+   * Thinking about that some more, this is all confused by my need
+   * to have different options for the same command across different projects.
+   * Maybe I need to make that need go away, or better still, have multuiple
+   * types (global and pre-project?), which still leaves me wanting to filter
+   * some actions.  Maybe that's it: is there an isVisible method or something?
+   */
   void addClActions(List<ClaCommand> commands) {
     for( ClaCommand iCommand : commands ){
       if( StringUtils.isBlank(iCommand.getName()) ){
