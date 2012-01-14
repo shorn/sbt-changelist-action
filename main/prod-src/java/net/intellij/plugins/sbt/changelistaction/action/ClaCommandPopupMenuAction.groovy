@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import net.intellij.plugins.sbt.changelistaction.util.ClaUtil
 import net.intellij.plugins.sbt.changelistaction.ClaProjectComponent
 import net.intellij.plugins.sbt.changelistaction.ClaCommand
+import com.intellij.openapi.diagnostic.Logger
 
 /**
  * this needs work, need to separate the concept of command, popup and action.
@@ -13,6 +14,8 @@ import net.intellij.plugins.sbt.changelistaction.ClaCommand
  * elegant solution using groovy mixin/trait thingies?
  */
 class ClaCommandPopupMenuAction extends AnAction {
+  private final Logger log = Logger.getInstance(getClass())
+
   ClaProjectComponent projectComponent
   ClaCommand command;
   String id
@@ -37,14 +40,12 @@ class ClaCommandPopupMenuAction extends AnAction {
 
   @Override
   public void actionPerformed(AnActionEvent e) {
+    log.debug "actionPerformed() on thread ${Thread.currentThread().name}"
     projectComponent.executionManager.execute(this)
 
 
 //    DataContext dataContext = e.getDataContext();
 //    Project project = DataKeys.PROJECT.getData(dataContext);
-
-    // TODO:SBT consider adding an option to "auto-clear" the console
-    // before every action
 
     // test
 //    Messages.showMessageDialog(

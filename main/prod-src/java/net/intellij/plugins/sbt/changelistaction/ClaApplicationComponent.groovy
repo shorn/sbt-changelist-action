@@ -14,8 +14,6 @@ class ClaApplicationComponent implements ApplicationComponent{
   @Override
   void initComponent() {
     log.debug "initComponent() ${Thread.currentThread().name}"
-    ToolWindowManager toolWindowMgr = ApplicationManager.getApplication().getComponent(ToolWindowManager.class)
-    log.debug "initComponent() twm - ${toolWindowMgr}"
   }
 
   @Override

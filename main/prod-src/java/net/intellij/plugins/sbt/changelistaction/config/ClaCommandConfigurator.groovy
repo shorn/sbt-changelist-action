@@ -126,6 +126,11 @@ class ClaCommandConfigurator {
     return dialogWrapper.isOK();
   }
 
+  /**
+   * The superclass' ctor makes this really hard to groovify, couldn't
+   * figure out and had better things to do.  Maybe post a SO question about
+   * it.
+   */
   private class IdeaDialogWrapper extends DialogWrapper {
 
     private IdeaDialogWrapper(Project project, String title) {

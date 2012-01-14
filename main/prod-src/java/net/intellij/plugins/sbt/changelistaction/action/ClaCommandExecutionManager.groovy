@@ -4,7 +4,7 @@ import net.intellij.plugins.sbt.changelistaction.ClaProjectComponent
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.wm.ToolWindowManager
-import com.intellij.openapi.project.Project
+
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -20,46 +20,38 @@ import com.intellij.openapi.wm.ToolWindowAnchor
 import net.intellij.plugins.sbt.changelistaction.util.ClaUtil
 import com.intellij.execution.filters.TextConsoleBuilder
 import com.intellij.execution.filters.TextConsoleBuilderFactory
-import com.intellij.execution.process.OSProcessHandler
-import com.intellij.openapi.diagnostic.Logger
-import groovy.swing.SwingBuilder
-import com.intellij.util.IJSwingUtilities
-import com.intellij.openapi.actionSystem.ActionToolbar
 
-/**
- * The implementation of this class really sucks - I want the GUI widgets
- * to be lazy (not exist until the first time a command is actually executed).
- * The way getConsoleView() and createToolWindow() interact is just wrong.
- * Maybe I should move the laziness - instead of making the GUI widgets
- * lazy on this class, make them eager but make the creationg of this class
- * itself lazy in the projectComponent?
- * Problems with that approach:
- * - handling the clsoing of the window button and disposing of the GUI widgets
- * - handling showing the window
- * - dealing with "re-execute last command" style functionality
- * - I don't want to complicate the project component with details of
- *   executing commands or GUI stuff
- */
+import com.intellij.openapi.diagnostic.Logger
+
+import com.intellij.openapi.actionSystem.ActionToolbar
+import com.intellij.execution.ui.ConsoleViewContentType
+
+import com.intellij.execution.process.CapturingProcessHandler
+import com.intellij.execution.process.ProcessOutput
+import com.intellij.openapi.vfs.CharsetToolkit
+import com.intellij.execution.configurations.GeneralCommandLine
+import com.intellij.openapi.application.ApplicationManager
+
 class ClaCommandExecutionManager {
   private final Logger log = Logger.getInstance(getClass())
   private static String TOOL_WINDOW_ID = "CLA Console";
 
-  // ctor
+  // assigned in ctor
   ClaProjectComponent projectComponent
 
-  // lazy
+  // lazy, by init() method first time execute() is called
   ConsoleView consoleView;
   ToolWindow toolWindow;
 
-  // state for execute last command toolbar button
-  ClaCommandPopupMenuAction lastExecutedCommand
+  // saved by execute()
+  ClaCommandPopupMenuAction lastExecutedAction
 
 
   ClaCommandExecutionManager(ClaProjectComponent projectComponent) {
     this.projectComponent = projectComponent
   }
 
-  ConsoleView getConsoleView(){
+  ClaCommandExecutionManager init(){
     if( consoleView == null ){
       TextConsoleBuilder builder = TextConsoleBuilderFactory.getInstance().
         createBuilder(projectComponent.project);
@@ -72,7 +64,7 @@ class ClaCommandExecutionManager {
       toolWindow.show(null)
     }
 
-    return consoleView
+    this
   }
 
   ToolWindowManager getToolWindowMgr(){
@@ -111,13 +103,25 @@ class ClaCommandExecutionManager {
   private ActionToolbar createToolbar()
   {
     DefaultActionGroup actionGroup = new DefaultActionGroup();
-    actionGroup.add(new AnAction("Invoke changelist action",
+    actionGroup.add(new AnAction(
+      "",
       "Invoke previous user action on VCS changelist.",
       ClaUtil.getIcon16())
     {
-      public void actionPerformed(AnActionEvent anActionEvent) {
-        if( lastExecutedCommand != null ){
-          execute(lastExecutedCommand)
+      void actionPerformed(AnActionEvent anActionEvent) {
+        if (lastExecutedAction != null) {
+          execute(lastExecutedAction)
+        }
+      }
+
+      void update(AnActionEvent e) {
+        if( lastExecutedAction != null ){
+          e.presentation.text = "Re-execute $lastExecutedAction.command.name"
+          e.presentation.enabled = true
+        }
+        else {
+          e.presentation.text = "Re-execute last command"
+          e.presentation.enabled = false
         }
       }
     })
@@ -162,48 +166,41 @@ class ClaCommandExecutionManager {
     return window;
   }
 
-  /**
-   * Executes command and show it in the console.
-   */
-  public int execute(ClaCommandPopupMenuAction command) {
-    lastExecutedCommand = command
-    Runtime rt = Runtime.getRuntime();
-    log.warn "Invoking $command"
-
-    def stringCommand = command.formatCommandWithOptions()
-
-    try {
-      Process proc = rt.exec(stringCommand);
-      OSProcessHandler handler = new OSProcessHandler(proc, stringCommand);
-      getConsoleView().attachToProcess(handler);
-      handler.startNotify();
-
-/*
-            // any error message?
-            StreamGobbler errorGobbler = new
-                    StreamGobbler(proc.getErrorStream(), "ERROR");
-
-            // any output?
-            StreamGobbler outputGobbler = new
-                    StreamGobbler(proc.getInputStream(), "OUTPUT");
-
-            // kick them off
-            errorGobbler.run();
-            String out = outputGobbler.run();
-*/
-
-      // any error???
-      int exitValue = proc.waitFor();
-      log.debug("Exit value: " + exitValue);
-      return exitValue;
-    }
-    catch (Exception ex) {
-      // and error will actually show up in idea in one of those wierd
-      // popup panels, at least the first time
-      log.error("Error executing command.", ex);
-    }
-    return 0;
+  String getTimestamp(){
+    new Date().format('HH:mm:ss')
   }
 
+  void consoleLn(String output){
+    consoleView.print("$output\n", ConsoleViewContentType.NORMAL_OUTPUT)
+  }
+  
+  void execute(ClaCommandPopupMenuAction action){
+    if( consoleView == null ){
+      init()
+    }
 
+    lastExecutedAction = action
+
+    if( action.command.clearConsole ){
+      consoleView.clear()
+    }
+
+    GeneralCommandLine commandLine = new GeneralCommandLine()
+    commandLine.setExePath(action.command.command);
+    commandLine.addParameters( action.command.options.split(',') )
+//    commandLine.setWorkDirectory(...)
+
+    consoleLn "[$timestamp] executing $commandLine.commandLineString"
+
+    CapturingProcessHandler processHandler =
+      new CapturingProcessHandler(
+        commandLine.createProcess(),
+        CharsetToolkit.getDefaultSystemCharset());
+    consoleView.attachToProcess(processHandler);
+
+    ApplicationManager.application.executeOnPooledThread{
+      ProcessOutput processOutput = processHandler.runProcess();
+      consoleLn "[$timestamp] command returned: $processOutput.exitCode"
+    }
+  }
 }
