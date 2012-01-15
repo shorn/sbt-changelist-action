@@ -12,7 +12,8 @@ TODO:SBT create dirs ?
 
 
 Viewing logs.
-Logs from this plugin are written to the normal $LOG_DIR$/idea.log file.
+Logs from this plugin are written to the normal $LOG_DIR$/idea.log file, but this
+can be configured via the log.xml file.
 
 Note that the log.xml file you want is the one in the IDE JDK that you're
 using to run the plugin, not the one you're building with.

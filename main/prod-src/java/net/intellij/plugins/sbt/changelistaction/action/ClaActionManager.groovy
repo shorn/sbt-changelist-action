@@ -6,6 +6,11 @@ import com.intellij.openapi.diagnostic.Logger
 import net.intellij.plugins.sbt.changelistaction.ClaCommand
 import net.intellij.plugins.sbt.changelistaction.ClaProjectComponent
 import org.apache.commons.lang.StringUtils
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.Presentation
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.vcs.ProjectLevelVcsManager
 
 class ClaActionManager {
   private final Logger log = Logger.getInstance(getClass())
@@ -14,7 +19,7 @@ class ClaActionManager {
   DefaultActionGroup actionGroup
   ClaProjectComponent projectComponent
 
-  List<ClaCommandPopupMenuAction> actions = []
+//  List<ClaCommandPopupMenuAction> actions = []
 
   ClaActionManager(
     ClaProjectComponent projectComponent,
@@ -22,7 +27,14 @@ class ClaActionManager {
   {
     this.projectComponent = projectComponent
     this.actionManager = actionManager
-    this.actionGroup = getChangesViewMenuActionGroup(this.actionManager)
+    this.actionGroup = new DefaultActionGroup(){
+      void update(AnActionEvent e) {
+        e.presentation.visible = 
+          e.getData(PlatformDataKeys.PROJECT) == projectComponent.project
+        e.presentation.enabled = e.presentation.visible
+      }
+    }
+    getChangesViewMenuActionGroup(this.actionManager).add(actionGroup)
   }
 
 
@@ -51,42 +63,36 @@ class ClaActionManager {
    * both unregister and remove from popup menu all clactions
    */
  void removeClActions() {
-   actions.each{ ClaCommandPopupMenuAction action ->
-     actionGroup.remove(action)
+   actionGroup.childActionsOrStubs.each{ ClaCommandPopupMenuAction action ->
      actionManager.unregisterAction(action.id)
    }
+   actionGroup.removeAll()
 
-   actions.clear()
+//   actions.each{ action ->
+//     actionGroup.remove(action)
+//     actionManager.unregisterAction(action.id)
+//   }
+//
+//   actions.clear()
   }
 
-  /**
-   * Add command actions to changelist popup menu.
-   *
-   * These actions will show up in teh menu for ALL projects, which
-   * is sort of pointless (if you're right-clicking on a CL in one project
-   * why would you want to see the actions from a different project?)
-   * Thinking about that some more, this is all confused by my need
-   * to have different options for the same command across different projects.
-   * Maybe I need to make that need go away, or better still, have multuiple
-   * types (global and pre-project?), which still leaves me wanting to filter
-   * some actions.  Maybe that's it: is there an isVisible method or something?
-   */
   void addClActions(List<ClaCommand> commands) {
-    for( ClaCommand iCommand : commands ){
-      if( StringUtils.isBlank(iCommand.getName()) ){
+    commands.each{ command ->
+      if( StringUtils.isBlank(command.getName()) ){
         log.warn("not adding command with empty name to menu")
-        continue
+        return
       }
 
       ClaCommandPopupMenuAction action = new ClaCommandPopupMenuAction(
         projectComponent,
-        iCommand,
-        formatClActionId(iCommand.name) )
+        command,
+        formatClActionId(command.name) )
 
       actionManager.registerAction(action.id, action)
       actionGroup.add(action)
 
-      actions << action
+//      actionGroup.
+//      actions << action
     }
   }
 

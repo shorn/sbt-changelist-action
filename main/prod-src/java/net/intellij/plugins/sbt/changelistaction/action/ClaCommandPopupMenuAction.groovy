@@ -17,7 +17,7 @@ class ClaCommandPopupMenuAction extends AnAction {
   private final Logger log = Logger.getInstance(getClass())
 
   ClaProjectComponent projectComponent
-  ClaCommand command;
+  ClaCommand command
   String id
 
   ClaCommandPopupMenuAction(
@@ -28,19 +28,19 @@ class ClaCommandPopupMenuAction extends AnAction {
     super(
       iCommand.name,
       "",  // description
-      ClaUtil.getIcon16() )
+      ClaUtil.icon16 )
     this.projectComponent = projectComponent
     this.command = iCommand
     this.id = id
 
     // overwrite the description set in the ctor call coz we couldn't call
     // the format method from there
-    getTemplatePresentation().setDescription(formatCommandWithOptions());
+    // this was in java, maybe groovy makes it doable?
+    templatePresentation.description = formatCommandWithOptions()
   }
 
-  @Override
-  public void actionPerformed(AnActionEvent e) {
-    log.debug "actionPerformed() on thread ${Thread.currentThread().name}"
+  void actionPerformed(AnActionEvent e) {
+    log.debug "actionPerformed() on thread $ClaUtil.threadName"
     projectComponent.executionManager.execute(this)
 
 

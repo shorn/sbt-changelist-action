@@ -192,15 +192,23 @@ class ClaCommandExecutionManager {
 
     consoleLn "[$timestamp] executing $commandLine.commandLineString"
 
-    CapturingProcessHandler processHandler =
-      new CapturingProcessHandler(
-        commandLine.createProcess(),
-        CharsetToolkit.getDefaultSystemCharset());
-    consoleView.attachToProcess(processHandler);
 
     ApplicationManager.application.executeOnPooledThread{
-      ProcessOutput processOutput = processHandler.runProcess();
-      consoleLn "[$timestamp] command returned: $processOutput.exitCode"
+      try {
+        Process process = commandLine.createProcess()
+
+        CapturingProcessHandler processHandler =
+          new CapturingProcessHandler(
+            process,
+            CharsetToolkit.getDefaultSystemCharset());
+        consoleView.attachToProcess(processHandler);
+        ProcessOutput processOutput = processHandler.runProcess();
+        consoleLn "[$timestamp] command returned: $processOutput.exitCode"
+      }
+      catch( all ){
+        consoleLn "could not execute: $all"
+      }
     }
+
   }
 }

@@ -32,6 +32,8 @@ class ClaUtil {
     return getIcon("frog16.png")
   }
 
-
+  static String getThreadName(){
+    return Thread.currentThread().name
+  }
 
 }
