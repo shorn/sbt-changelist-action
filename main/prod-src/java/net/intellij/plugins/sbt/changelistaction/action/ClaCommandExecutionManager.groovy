@@ -191,8 +191,6 @@ class ClaCommandExecutionManager {
 //    commandLine.setWorkDirectory(...)
 
     consoleLn "[$timestamp] executing $commandLine.commandLineString"
-
-
     ApplicationManager.application.executeOnPooledThread{
       try {
         Process process = commandLine.createProcess()
@@ -206,7 +204,7 @@ class ClaCommandExecutionManager {
         consoleLn "[$timestamp] command returned: $processOutput.exitCode"
       }
       catch( all ){
-        consoleLn "could not execute: $all"
+        consoleLn "[$timestamp] could not execute: $all"
       }
     }
 
