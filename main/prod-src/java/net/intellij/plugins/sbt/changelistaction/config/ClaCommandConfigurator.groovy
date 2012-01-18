@@ -18,7 +18,26 @@ import javax.swing.JCheckBox
 import javax.swing.JComboBox
 import net.intellij.plugins.sbt.changelistaction.util.SimpleComboRenderer
 import com.intellij.openapi.diagnostic.Logger
+import javax.swing.JButton
+import groovy.swing.SwingBuilder
+import java.awt.event.KeyEvent
+import java.awt.event.ActionListener
+import com.intellij.openapi.util.IconLoader
+import com.intellij.openapi.ui.popup.ComponentPopupBuilder
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import javax.swing.KeyStroke
+import com.intellij.xml.util.HtmlUtil
+import com.intellij.util.ui.UIUtil
+import net.intellij.plugins.sbt.changelistaction.action.ClaCommandOptionBinding
+import javax.swing.JTextArea
+import javax.swing.JScrollPane
+import com.intellij.ui.components.JBScrollPane
 
+/**
+ * could use some validation
+ * - change the help icon to an eye, and make it red if error when parsing :)
+ * - maybe popop the error as a tooltip when tabbing out?
+ */
 class ClaCommandConfigurator {
   private final Logger log = Logger.getInstance(getClass())
 
@@ -27,8 +46,9 @@ class ClaCommandConfigurator {
   JPanel panel
   JTextField name
   JTextField command
-  JTextField options
+  JTextArea options
   TextFieldWithBrowseButton commandButton
+  JButton optionHelperButton
   JComboBox filePaths
   JCheckBox console
 
@@ -46,7 +66,7 @@ class ClaCommandConfigurator {
     panel = new JPanel()
     name = new JTextField()
     command = new JTextField()
-    options = new JTextField()
+    options = new JTextArea()
     commandButton = new TextFieldWithBrowseButton(command)
     commandButton.addBrowseFolderListener(
       "thetitle",
@@ -54,6 +74,12 @@ class ClaCommandConfigurator {
       project,
       FileChooserDescriptorFactory.createSingleFileDescriptor(null))
 
+    optionHelperButton = new SwingBuilder().button(
+      icon: IconLoader.getIcon("/actions/help.png"),
+      actionPerformed: {optionHelperPressed()}
+    )
+
+    
     filePaths = new JComboBox(ClaCommand.PathFormat.enumConstants)
     
     filePaths.setRenderer(new SimpleComboRenderer<ClaCommand.PathFormat>(){
@@ -78,13 +104,18 @@ class ClaCommandConfigurator {
     panel.setLayout(layout)
     CellConstraints cc = new CellConstraints()
 
+
     panel.add(new JLabel("Name:"), cc.xy(1, 1))
     panel.add(name, cc.xy(2, 1))
     panel.add(new JLabel("Action:"), cc.xy(1, 2))
     panel.add(command, cc.xy(2, 2))
     panel.add(commandButton, cc.xy(3, 2))
     panel.add(new JLabel("Option:"), cc.xy(1, 3))
-    panel.add(options, cc.xy(2, 3))
+
+    options.setRows(5)
+    panel.add(new JBScrollPane(options), cc.xy(2, 3))
+    panel.add(optionHelperButton, cc.xy(3, 3, "left, bottom"))
+
     panel.add(new JLabel("Filenames:"), cc.xy(1, 4))
     panel.add(filePaths, cc.xy(2, 4))
     panel.add(
@@ -110,6 +141,35 @@ class ClaCommandConfigurator {
     c.options = options.text
     c.filenames = filePaths.selectedItem as ClaCommand.PathFormat
     c.clearConsole = console.selected
+  }
+
+  void optionHelperPressed() {
+    log.debug "optionHelperPressed"
+
+    List result = null
+    def error = null
+    try {
+      result = new ClaCommandOptionBinding().parseOptions(options.text)
+    }
+    catch( all ){
+      error = all
+    }
+
+    log.debug("options eval: $result|$error")
+    String content
+    if( result ){
+      content = UIUtil.toHtml("options: $result")
+    }
+    else {
+      content = UIUtil.toHtml("error: $error")
+    }
+    JPanel contentPanel = new JPanel()
+    contentPanel.add( new JLabel(content) )
+
+    ComponentPopupBuilder builder = JBPopupFactory.getInstance().
+      createComponentPopupBuilder(contentPanel, contentPanel);
+    builder.setProject(project).
+      createPopup().showUnderneathOf(optionHelperButton)
   }
 
   /**
@@ -148,5 +208,6 @@ class ClaCommandConfigurator {
       return name;
     }
   }
+
 
 }

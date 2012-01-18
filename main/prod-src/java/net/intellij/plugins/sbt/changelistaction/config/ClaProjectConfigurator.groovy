@@ -109,15 +109,6 @@ class TablePanel {
         buttonBuilder.addGridded(button);
         buttonBuilder.addRelatedGap();
     }
-//    buttonBuilder.addGridded(addButton);
-//    buttonBuilder.addRelatedGap();
-//    buttonBuilder.addGridded(editButton);
-//    buttonBuilder.addRelatedGap();
-//    buttonBuilder.addGridded(removeButton);
-//    buttonBuilder.addRelatedGap();
-//    buttonBuilder.addGridded(moveUpButton);
-//    buttonBuilder.addRelatedGap();
-//    buttonBuilder.addGridded(moveDownButton);
 
     panel.setLayout(layout)
     CellConstraints cc = new CellConstraints();
@@ -134,7 +125,7 @@ class TablePanel {
   }
 
   private void createComponents() {
-    def swing = new SwingBuilder()
+    SwingBuilder swing = new SwingBuilder()
 
     panel = new JPanel()
 

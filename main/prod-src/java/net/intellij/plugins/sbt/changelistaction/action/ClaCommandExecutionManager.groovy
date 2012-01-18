@@ -186,8 +186,15 @@ class ClaCommandExecutionManager {
     }
 
     GeneralCommandLine commandLine = new GeneralCommandLine()
-    commandLine.setExePath(action.command.command);
-    commandLine.addParameters( action.command.options.split(',') )
+    commandLine.exePath = action.command.command
+    try {
+      commandLine.addParameters(
+        new ClaCommandOptionBinding().parseOptions(action.command.options) )
+    }
+    catch( all ){
+      consoleLn(all.toString())
+      return
+    }
 //    commandLine.setWorkDirectory(...)
 
     consoleLn "[$timestamp] executing $commandLine.commandLineString"
