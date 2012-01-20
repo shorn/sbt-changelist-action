@@ -34,11 +34,6 @@ class ClaCommandOptionBinding {
         else {
           super.getVariable(name)
         }
-
-//        if( ClaCommandOptionBinding.this.properties.containsKey(name) ) {
-//          return ClaCommandOptionBinding.this.properties[name]
-//        }
-//        super.getVariable(name)
       }
     }
 
@@ -119,8 +114,8 @@ class ClaCommandOptionBinding {
   }
 
   @OptionBinding("wibble")
-  int getFlibble(){
-    return 0;
+  String getFlibble(){
+    return "wibble"
   }
 
 

@@ -144,22 +144,31 @@ class ClaCommandConfigurator {
   void optionHelperPressed() {
     log.debug "optionHelperPressed"
 
+    ClaCommandOptionBinding optionBinding = new ClaCommandOptionBinding()
+
     List result = null
     def error = null
     try {
-      result = new ClaCommandOptionBinding().parseOptions(options.text)
+      result = optionBinding.parseOptions(options.text)
     }
     catch( all ){
       error = all
     }
 
+    StringBuilder doco = new StringBuilder()
+    optionBinding.optionsDocs.each{ name, doc ->
+      doco << "$name - $doc <br>"
+    }
+    doco << "<hr>"
+
+
     log.debug("options eval: $result|$error")
     String content
     if( result ){
-      content = UIUtil.toHtml("options: $result")
+      content = UIUtil.toHtml("$doco options: $result")
     }
     else {
-      content = UIUtil.toHtml("error: $error")
+      content = UIUtil.toHtml("$doco error: $error")
     }
     JPanel contentPanel = new JPanel()
     contentPanel.add( new JLabel(content) )
