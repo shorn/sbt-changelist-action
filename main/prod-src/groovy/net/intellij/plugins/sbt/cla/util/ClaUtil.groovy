@@ -1,15 +1,12 @@
-package net.intellij.plugins.sbt.changelistaction.util
+package net.intellij.plugins.sbt.cla.util
 
-import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.actionSystem.ActionManager
-import net.intellij.plugins.sbt.changelistaction.ClaProjectComponent
 import javax.swing.Icon
-import com.intellij.openapi.util.IconLoader
+
 import javax.swing.ImageIcon
 
 class ClaUtil {
   static final String ICON_LOCATION =
-    "/net/intellij/plugins/sbt/changelistaction/icons"
+    "/net/intellij/plugins/sbt/cla/icons"
   static Icon icon16;
   static Icon icon32;
 

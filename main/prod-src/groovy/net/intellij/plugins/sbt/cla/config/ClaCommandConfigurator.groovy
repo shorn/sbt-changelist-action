@@ -1,4 +1,4 @@
-package net.intellij.plugins.sbt.changelistaction.config
+package net.intellij.plugins.sbt.cla.config
 
 import javax.swing.JTextField
 import javax.swing.JPanel
@@ -11,27 +11,25 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.project.Project
 import javax.swing.JComponent
-import net.intellij.plugins.sbt.changelistaction.ClaCommand
+import net.intellij.plugins.sbt.cla.ClaCommand
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import javax.swing.JCheckBox
 import javax.swing.JComboBox
-import net.intellij.plugins.sbt.changelistaction.util.SimpleComboRenderer
+import net.intellij.plugins.sbt.cla.util.SimpleComboRenderer
 import com.intellij.openapi.diagnostic.Logger
 import javax.swing.JButton
 import groovy.swing.SwingBuilder
-import java.awt.event.KeyEvent
-import java.awt.event.ActionListener
-import com.intellij.openapi.util.IconLoader
+
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder
 import com.intellij.openapi.ui.popup.JBPopupFactory
-import javax.swing.KeyStroke
-import com.intellij.xml.util.HtmlUtil
+
 import com.intellij.util.ui.UIUtil
-import net.intellij.plugins.sbt.changelistaction.action.ClaCommandOptionBinding
+import net.intellij.plugins.sbt.cla.action.ClaCommandOptionBinding
 import javax.swing.JTextArea
-import javax.swing.JScrollPane
+
 import com.intellij.ui.components.JBScrollPane
+import net.intellij.plugins.sbt.cla.util.ClaUtil
 
 /**
  * could use some validation
@@ -75,7 +73,7 @@ class ClaCommandConfigurator {
       FileChooserDescriptorFactory.createSingleFileDescriptor(null))
 
     optionHelperButton = new SwingBuilder().button(
-      icon: IconLoader.getIcon("/actions/help.png"),
+      icon: ClaUtil.icon16,
       actionPerformed: {optionHelperPressed()}
     )
 

@@ -1,4 +1,4 @@
-package net.intellij.plugins.sbt.changelistaction.config
+package net.intellij.plugins.sbt.cla.config
 
 import javax.swing.JPanel
 import java.awt.BorderLayout
@@ -8,7 +8,7 @@ import javax.swing.ListSelectionModel
 import ca.odell.glazedlists.gui.TableFormat
 import ca.odell.glazedlists.EventList
 import ca.odell.glazedlists.swing.EventTableModel
-import net.intellij.plugins.sbt.changelistaction.util.NoCellFocusRenderer
+import net.intellij.plugins.sbt.cla.util.NoCellFocusRenderer
 import ca.odell.glazedlists.GlazedLists
 import ca.odell.glazedlists.BasicEventList
 import com.intellij.ui.components.JBScrollPane
@@ -20,9 +20,9 @@ import javax.swing.JButton
 
 import java.awt.event.KeyEvent
 
-import net.intellij.plugins.sbt.changelistaction.ClaState
-import net.intellij.plugins.sbt.changelistaction.ClaCommand
-import net.intellij.plugins.sbt.changelistaction.ClaProjectComponent
+import net.intellij.plugins.sbt.cla.ClaState
+import net.intellij.plugins.sbt.cla.ClaCommand
+import net.intellij.plugins.sbt.cla.ClaProjectComponent
 import com.intellij.openapi.diagnostic.Logger
 
 import groovy.swing.SwingBuilder

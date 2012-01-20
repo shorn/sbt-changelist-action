@@ -1,4 +1,4 @@
-package net.intellij.plugins.sbt.changelistaction
+package net.intellij.plugins.sbt.cla
 
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.ProjectComponent
@@ -12,13 +12,12 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.xmlb.XmlSerializerUtil
 import javax.swing.Icon
 import javax.swing.JComponent
-import net.intellij.plugins.sbt.changelistaction.config.ClaProjectConfigurator
-import net.intellij.plugins.sbt.changelistaction.util.ClaUtil
-import net.intellij.plugins.sbt.changelistaction.action.ClaActionManager
+import net.intellij.plugins.sbt.cla.config.ClaProjectConfigurator
+import net.intellij.plugins.sbt.cla.util.ClaUtil
+import net.intellij.plugins.sbt.cla.action.ClaActionManager
 import com.intellij.openapi.actionSystem.ActionManager
-import net.intellij.plugins.sbt.changelistaction.action.ClaCommandExecutionManager
-import com.intellij.openapi.application.Application
-import com.intellij.openapi.actionSystem.DataConstants
+import net.intellij.plugins.sbt.cla.action.ClaCommandExecutionManager
+
 import com.intellij.openapi.application.ApplicationManager
 
 @State(

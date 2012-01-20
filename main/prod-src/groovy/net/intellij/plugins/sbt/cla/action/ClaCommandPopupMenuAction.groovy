@@ -1,11 +1,11 @@
-package net.intellij.plugins.sbt.changelistaction.action
+package net.intellij.plugins.sbt.cla.action
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 
-import net.intellij.plugins.sbt.changelistaction.util.ClaUtil
-import net.intellij.plugins.sbt.changelistaction.ClaProjectComponent
-import net.intellij.plugins.sbt.changelistaction.ClaCommand
+import net.intellij.plugins.sbt.cla.util.ClaUtil
+import net.intellij.plugins.sbt.cla.ClaProjectComponent
+import net.intellij.plugins.sbt.cla.ClaCommand
 import com.intellij.openapi.diagnostic.Logger
 
 /**

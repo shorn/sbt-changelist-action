@@ -1,10 +1,7 @@
-package net.intellij.plugins.sbt.changelistaction
+package net.intellij.plugins.sbt.cla
 
 import com.intellij.openapi.components.ApplicationComponent
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.application.Application
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.wm.ToolWindowManager
 
 class ClaApplicationComponent implements ApplicationComponent{
   public static final String COMPONENT_NAME = "ClaApplicationComponent"

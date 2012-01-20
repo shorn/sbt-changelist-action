@@ -12,7 +12,7 @@
   <application-components>
     <component>
       <implementation-class>
-        net.intellij.plugins.sbt.changelistaction.ClaApplicationComponent
+        net.intellij.plugins.sbt.cla.ClaApplicationComponent
       </implementation-class>
     </component>
   </application-components>
@@ -20,7 +20,7 @@
   <project-components>
     <component>
       <implementation-class>
-        net.intellij.plugins.sbt.changelistaction.ClaProjectComponent
+        net.intellij.plugins.sbt.cla.ClaProjectComponent
       </implementation-class>
     </component>
   </project-components>

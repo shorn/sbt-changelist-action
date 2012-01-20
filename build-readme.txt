@@ -32,7 +32,7 @@ to log to a separate file as well though.
     </layout>
   </appender>
 
-  <category name="#net.intellij.plugins.sbt.changelistaction">
+  <category name="#net.intellij.plugins.sbt.cla">
     <level value="DEBUG"/>
     <appender-ref ref="SBT_CLA_FILE"/>
   </category>

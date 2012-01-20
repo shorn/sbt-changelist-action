@@ -1,6 +1,6 @@
-package net.intellij.plugins.sbt.changelistaction.action
+package net.intellij.plugins.sbt.cla.action
 
-import net.intellij.plugins.sbt.changelistaction.ClaProjectComponent
+import net.intellij.plugins.sbt.cla.ClaProjectComponent
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.openapi.wm.ToolWindowManager
@@ -17,7 +17,7 @@ import java.awt.BorderLayout
 import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.content.Content
 import com.intellij.openapi.wm.ToolWindowAnchor
-import net.intellij.plugins.sbt.changelistaction.util.ClaUtil
+import net.intellij.plugins.sbt.cla.util.ClaUtil
 import com.intellij.execution.filters.TextConsoleBuilder
 import com.intellij.execution.filters.TextConsoleBuilderFactory
 

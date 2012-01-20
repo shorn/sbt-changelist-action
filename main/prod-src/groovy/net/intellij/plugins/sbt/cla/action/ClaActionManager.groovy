@@ -1,16 +1,14 @@
-package net.intellij.plugins.sbt.changelistaction.action
+package net.intellij.plugins.sbt.cla.action
 
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.diagnostic.Logger
-import net.intellij.plugins.sbt.changelistaction.ClaCommand
-import net.intellij.plugins.sbt.changelistaction.ClaProjectComponent
+import net.intellij.plugins.sbt.cla.ClaCommand
+import net.intellij.plugins.sbt.cla.ClaProjectComponent
 import org.apache.commons.lang.StringUtils
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.Presentation
-import com.intellij.openapi.project.Project
+
 import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.vcs.ProjectLevelVcsManager
 
 class ClaActionManager {
   private final Logger log = Logger.getInstance(getClass())
