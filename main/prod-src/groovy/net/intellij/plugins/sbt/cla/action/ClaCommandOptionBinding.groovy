@@ -10,12 +10,22 @@ import java.lang.annotation.ElementType
 import java.lang.reflect.Method
 import java.lang.annotation.Annotation
 import net.intellij.plugins.sbt.cla.ClaProjectComponent
-import com.intellij.openapi.vcs.changes.ChangeListManager
+
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vcs.changes.ChangeList
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.vcs.VcsDataKeys
+
 import net.intellij.plugins.sbt.cla.util.ClaUtil
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@interface OptionBinding{
+  /** expected to be some doco of the option */
+  String value()
+}
+
+@InheritConstructors
+class OptionParsingException extends RuntimeException{ }
+
 
 class ClaCommandOptionBinding {
   private final Logger log = Logger.getInstance(getClass())
@@ -34,7 +44,7 @@ class ClaCommandOptionBinding {
    * @throws OptionParsingException if the expression doesn't evaluate
    * to a list
    */
-  List parseOptions(String options){
+  List<String> parseOptions(String options){
     // override binding.getVariable() to allow unqualifed access to the
     // whatever properties we define on the enclosing ClaCommandOptionBinding
     // class with the OptionBinding
@@ -54,16 +64,36 @@ class ClaCommandOptionBinding {
 
     GroovyShell shell = new GroovyShell(binding)
 
-    def result = shell.evaluate(options)
+    def evalResults = shell.evaluate(options)
 
-    log.debug("options eval: $result")
-    if( result instanceof  List ){
-      return (List) result
-    }
-    else {
+    return flattenEvalResult(evalResults)
+  }
+
+  /**
+   * This method could get very fancy if it wanted
+   */
+  private List<String> flattenEvalResult(evalResults) {
+    log.debug("options eval: $evalResults")
+    if (!evalResults instanceof List) {
       throw new OptionParsingException(
-        "options must evaluate to a String<List>, but got: $result")
+        "options must evaluate to a String<List>, but got: $evalResults")
     }
+
+    List<String> optionsResult = []
+    evalResults.collect { evalResult ->
+      if (evalResult == null) {
+        return
+      }
+      if (evalResult instanceof Iterable) {
+        ((Iterable) evalResult).each {
+          optionsResult << it.toString()
+        }
+      }
+      else {
+        optionsResult << evalResult.toString()
+      }
+    }
+    return optionsResult
   }
 
   Object getBindingOptionValue(String varName){
@@ -143,14 +173,3 @@ class ClaCommandOptionBinding {
 
 }
 
-/**
- * value is expected to be some documentation of the option
- */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-@interface OptionBinding{
-  String value()
-}
-
-@InheritConstructors
-class OptionParsingException extends RuntimeException{ }
