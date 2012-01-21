@@ -54,7 +54,7 @@ implements
     super()
     this.project = project
     appliationComponent =
-      ApplicationManager.getApplication().getComponent(ClaApplicationComponent)
+      ApplicationManager.application.getComponent(ClaApplicationComponent)
   }
 
 
@@ -119,7 +119,7 @@ implements
   }
 
   Icon getIcon() {
-    return ClaUtil.getIcon32();
+    return ClaUtil.icon32
   }
 
   /**

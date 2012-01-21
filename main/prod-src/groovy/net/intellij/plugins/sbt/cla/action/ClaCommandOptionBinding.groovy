@@ -8,13 +8,15 @@ import java.lang.annotation.Target
 import java.lang.annotation.RetentionPolicy
 import java.lang.annotation.ElementType
 import java.lang.reflect.Method
-import java.lang.annotation.Annotation
+
 import net.intellij.plugins.sbt.cla.ClaProjectComponent
 
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vcs.changes.ChangeList
 
 import net.intellij.plugins.sbt.cla.util.ClaUtil
+import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.roots.ProjectFileIndex
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
@@ -98,7 +100,7 @@ class ClaCommandOptionBinding {
 
   Object getBindingOptionValue(String varName){
     Method m = null
-    ClaCommandOptionBinding.getMethodsForPropertiesWithAnnotation(
+    ClaUtil.getMethodsForPropertiesWithAnnotation(
       ClaCommandOptionBinding, OptionBinding).each
       { propName, method ->
         log.debug "$varName - $propName"
@@ -114,37 +116,11 @@ class ClaCommandOptionBinding {
       return null
     }
   }
-  
-  static Method getMethodForProperty(
-    Class<?> clazz,
-    String propName,
-    Class<?> propType)
-  {
-    String getterName = MetaProperty.getGetterName(
-      propName, propType)
-    clazz.getMethod(getterName, [] as Class[])
-  }
 
-  public static Map<String, Method> getMethodsForPropertiesWithAnnotation(
-    Class<?> clazz,
-    Class<? extends Annotation> annoClass)
-  {
-    def result = [:]
-    clazz.metaClass.properties.each { metaProperty ->
-      Method m = getMethodForProperty(clazz, metaProperty.name, metaProperty.type)
-      m.annotations.each { anno ->
-        if( annoClass.isInstance(anno) ){
-          result[metaProperty.name] = m
-        }
-      }
-    }
-
-    result
-  }
 
   Map<String, String> getOptionsDocs(){
     def result = [:]
-    getMethodsForPropertiesWithAnnotation(
+    ClaUtil.getMethodsForPropertiesWithAnnotation(
       ClaCommandOptionBinding, OptionBinding).
     each { name, method ->
       result[name] = method.getAnnotation(OptionBinding).value()
@@ -163,10 +139,22 @@ class ClaCommandOptionBinding {
     return "wibble"
   }
   
-  @OptionBinding("get the list of changes")
+  @OptionBinding("get the list of changes as a single space separated string")
   String getChangeListString(){
     List<VirtualFile> files = ClaUtil.getChangelistFiles(changeList)
     return files.join(" ")
+  }
+
+  @OptionBinding("com.intellij.openapi.roots.ProjectRootManager")
+  ProjectRootManager getRootManager(){
+    ProjectRootManager.getInstance(projectComponent.project)
+  }
+  
+  @OptionBinding("com.intellij.openapi.roots.ProjectFileIndex")
+  ProjectFileIndex getFileIndex(){
+    ProjectFileIndex index = rootManager.getFileIndex()
+
+    return index
   }
 
 

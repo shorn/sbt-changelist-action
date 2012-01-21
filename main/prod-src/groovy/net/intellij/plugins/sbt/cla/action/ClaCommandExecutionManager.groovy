@@ -33,12 +33,13 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.vcs.changes.ChangeList
 import net.intellij.plugins.sbt.cla.ClaCommand
+import net.intellij.plugins.sbt.cla.config.ClaCommandConfigurator
 
 /**
- * At the moment, all process write to the same tool window.
+ * At the moment, all processes write to the same tool window.
  * It probably makes sense to break out seperate executions of an invocation
  * into their own tab or something. The single consoleView is mostly annoying
- * because when you invoke on multiple changesets, seach command is executed
+ * because when you invoke on multiple changesets, each command is executed
  * in a separate thread and their output ends up being interleaved.
  * I think the consoleView println method is threadsafe (I think) it's just
  * confusing as hell to try and read the output.
@@ -114,11 +115,11 @@ class ClaCommandExecutionManager {
 
   private ActionToolbar createToolbar()
   {
-    DefaultActionGroup actionGroup = new DefaultActionGroup();
+    DefaultActionGroup actionGroup = new DefaultActionGroup()
     actionGroup.add(new AnAction(
       "",
       "Invoke previous user action on VCS changelist.",
-      ClaUtil.getIcon16())
+      ClaUtil.icon16)
     {
       void actionPerformed(AnActionEvent anActionEvent) {
         // not sure if I should replace the invocation event or not,
@@ -142,11 +143,32 @@ class ClaCommandExecutionManager {
 
     actionGroup.add(
       new AnAction(
+        "Edit",
+        "Edit last command",
+        ClaUtil.getIcon("cog16.png")) {
+        public void actionPerformed(AnActionEvent anActionEvent) {
+          editLastInvocation();
+        }
+
+        void update(AnActionEvent e) {
+          if( lastInvocation != null ){
+            e.presentation.text = "Edit $lastInvocation.action.command.name"
+            e.presentation.enabled = true
+          }
+          else {
+            e.presentation.text = "Edit last command"
+            e.presentation.enabled = false
+          }
+        }
+      }
+    )
+    actionGroup.add(
+      new AnAction(
         "Clear console",
         "Clear console window.",
         ClaUtil.getIcon("clear.png")) {
         public void actionPerformed(AnActionEvent anActionEvent) {
-          consoleView.clear();
+          consoleView.clear()
         }
       }
     )
@@ -154,12 +176,25 @@ class ClaCommandExecutionManager {
       "Close Changelist Action window.",
       IconLoader.getIcon("/actions/cancel.png")) {
       public void actionPerformed(AnActionEvent anActionEvent) {
-        disposeOfConsole();
+        disposeOfConsole()
       }
     });
 
-    return ActionManager.getInstance().createActionToolbar(
+    return ActionManager.instance.createActionToolbar(
       ActionPlaces.UNKNOWN, actionGroup, false)
+  }
+
+  void editLastInvocation() {
+    ClaCommandConfigurator editForm =
+      new ClaCommandConfigurator(this.projectComponent).init()
+
+    editForm.updatePanelFieldsFromObject(lastInvocation.action.command)
+
+    boolean userPressedOk = editForm.showAsIdeaDialog("Edit command")
+    if( userPressedOk ){
+      editForm.updateObjectFromPanelFields(lastInvocation.action.command)
+    }
+
   }
 
   private static ToolWindow registerToolWindow(
@@ -196,12 +231,18 @@ class ClaCommandExecutionManager {
     lastInvocation = invocation
 
     if( invocation.action.command.clearConsole ){
+      // obviously, this is pretty "racy" for multiple executions -
+      // either initiated multiple times by the user or because of
+      // multi-changelst selection, later executions are going to clear
+      // output in "last-wins" fashion
       consoleView.clear()
     }
 
     ChangeList[] selectedChangelists = invocation.changeLists
     if( selectedChangelists.length == 0 ){
-      log.warn "selected changelists collection is empty - how does this happen?"
+      // I've seen this happen once when invoction a command on the
+      // "unversioned files" section of the changes view
+      log.warn "selected changelists collection is empty - how did this happen?"
       return 
     }
 
@@ -211,6 +252,9 @@ class ClaCommandExecutionManager {
   }
 
   private execute(ClaActionInvocation invocation, ChangeList changeList) {
+
+    projectComponent.project.getBaseDir()
+
     GeneralCommandLine commandLine = new GeneralCommandLine()
     commandLine.exePath = invocation.action.command.command
     ClaCommandOptionBinding optionBinding =
@@ -240,7 +284,7 @@ class ClaCommandExecutionManager {
         ProcessOutput processOutput = processHandler.runProcess();
         consoleLn "[$timestamp] command returned: $processOutput.exitCode"
       }
-      catch (all) {
+      catch( all ){
         consoleLn "[$timestamp] could not execute: $all"
       }
     }

@@ -13,6 +13,8 @@ import com.google.common.base.Function
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.google.common.base.Joiner
 import com.intellij.openapi.diagnostic.Logger
+import java.lang.reflect.Method
+import java.lang.annotation.Annotation
 
 class ClaUtil {
   private final static Logger log = Logger.getInstance(ClaUtil)
@@ -158,4 +160,31 @@ class ClaUtil {
   }
 
 
+  static Method getMethodForProperty(
+    Class<?> clazz,
+    String propName,
+    Class<?> propType)
+  {
+    String getterName = MetaProperty.getGetterName(
+      propName, propType)
+    clazz.getMethod(getterName, [] as Class[])
+  }
+
+  static Map<String, Method> getMethodsForPropertiesWithAnnotation(
+    Class<?> clazz,
+    Class<? extends Annotation> annoClass)
+  {
+    def result = [:]
+    clazz.metaClass.properties.each { metaProperty ->
+      Method m = getMethodForProperty(
+        clazz, metaProperty.name, metaProperty.type)
+      m.annotations.each { anno ->
+        if( annoClass.isInstance(anno) ){
+          result[metaProperty.name] = m
+        }
+      }
+    }
+
+    result
+  }
 }

@@ -22,15 +22,15 @@ class ClaCommandPopupMenuAction extends AnAction {
 
   ClaCommandPopupMenuAction(
     ClaProjectComponent projectComponent,
-    ClaCommand iCommand,
+    ClaCommand command,
     String id)
   {
     super(
-      iCommand.name,
+      command.name,
       "",  // description
       ClaUtil.icon16 )
     this.projectComponent = projectComponent
-    this.command = iCommand
+    this.command = command
     this.id = id
 
     // overwrite the description set in the ctor call coz we couldn't call
@@ -39,6 +39,7 @@ class ClaCommandPopupMenuAction extends AnAction {
     templatePresentation.description = formatCommandWithOptions()
   }
 
+  @Override
   void actionPerformed(AnActionEvent e) {
     log.debug "actionPerformed() on thread $ClaUtil.threadName"
     projectComponent.executionManager.executeAgainstSelectedChangeLists(
@@ -47,6 +48,11 @@ class ClaCommandPopupMenuAction extends AnAction {
 
   String formatCommandWithOptions() {
     return "$command.command $command.options"
+  }
+
+  @Override
+  void update(AnActionEvent e) {
+    e.presentation.text = command.name
   }
 
 }

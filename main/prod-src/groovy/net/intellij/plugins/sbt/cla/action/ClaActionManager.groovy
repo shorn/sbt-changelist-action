@@ -17,8 +17,6 @@ class ClaActionManager {
   DefaultActionGroup actionGroup
   ClaProjectComponent projectComponent
 
-//  List<ClaCommandPopupMenuAction> actions = []
-
   ClaActionManager(
     ClaProjectComponent projectComponent,
     ActionManager actionManager)
@@ -65,13 +63,6 @@ class ClaActionManager {
      actionManager.unregisterAction(action.id)
    }
    actionGroup.removeAll()
-
-//   actions.each{ action ->
-//     actionGroup.remove(action)
-//     actionManager.unregisterAction(action.id)
-//   }
-//
-//   actions.clear()
   }
 
   void addClActions(List<ClaCommand> commands) {
@@ -88,9 +79,6 @@ class ClaActionManager {
 
       actionManager.registerAction(action.id, action)
       actionGroup.add(action)
-
-//      actionGroup.
-//      actions << action
     }
   }
 
