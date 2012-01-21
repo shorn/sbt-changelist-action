@@ -210,7 +210,9 @@ class TablePanel {
 
     ClaCommandConfigurator editForm =
       new ClaCommandConfigurator(this.projectComponent).init();
-    editForm.updatePanelFieldsFromObject(commands.get(selectedRow));
+
+    ClaCommand oldCommand = commands.get(selectedRow)
+    editForm.updatePanelFieldsFromObject(oldCommand);
 
     boolean userPressedOk =
       editForm.showAsIdeaDialog("Edit command");
@@ -218,13 +220,17 @@ class TablePanel {
       // we use a new object so that comparing the list from the project state
       // and the table list  (for "isModified") will come up with false in
       // the case of a single command being edited
-      ClaCommand cmd = new ClaCommand()
-      editForm.updateObjectFromPanelFields(cmd);
-      commands.set(selectedRow, cmd);
-
-      editForm.updateObjectFromPanelFields(cmd);
+      ClaCommand newCommand = new ClaCommand()
+      editForm.updateObjectFromPanelFields(newCommand);
+      
+      if( oldCommand == newCommand ){
+        log.info "command was not changed, leaving the old command in place"
+      }
+      else {
+        commands.set(selectedRow, newCommand);
+        projectComponent.commandUpdated(oldCommand, newCommand)
+      }
     }
-
   }
 
   public void setSelectedRow(int selectedRow){

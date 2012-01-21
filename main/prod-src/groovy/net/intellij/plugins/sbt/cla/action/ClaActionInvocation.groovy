@@ -1,6 +1,8 @@
 package net.intellij.plugins.sbt.cla.action
 
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.vcs.changes.ChangeList
+import net.intellij.plugins.sbt.cla.util.ClaUtil
 
 /**
  * represents an invocation of a particular command via an action.
@@ -17,6 +19,11 @@ class ClaActionInvocation {
   ClaCommandPopupMenuAction action
   AnActionEvent actionEvent
 
+  ChangeList[] getChangeLists(){
+    ClaUtil.getSelectedChangelists(actionEvent.dataContext)
+  }
 
-
+  String getDescription(){
+    "'$action.command.name' on changelist $changeLists"
+  }
 }

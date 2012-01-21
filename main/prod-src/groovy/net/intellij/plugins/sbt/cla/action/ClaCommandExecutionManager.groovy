@@ -32,6 +32,7 @@ import com.intellij.execution.process.ProcessOutput
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.vcs.changes.ChangeList
+import net.intellij.plugins.sbt.cla.ClaCommand
 
 /**
  * At the moment, all process write to the same tool window.
@@ -55,7 +56,7 @@ class ClaCommandExecutionManager {
   ToolWindow toolWindow
 
   // saved by executeAgainstSelectedChangeLists()
-  ClaActionInvocation lastExecutedAction
+  ClaActionInvocation lastInvocation
 
 
   ClaCommandExecutionManager(ClaProjectComponent projectComponent) {
@@ -122,18 +123,14 @@ class ClaCommandExecutionManager {
       void actionPerformed(AnActionEvent anActionEvent) {
         // not sure if I should replace the invocation event or not,
         // maybe this is what causes the empty changelist problem?
-        if (lastExecutedAction != null) {
-          executeAgainstSelectedChangeLists(lastExecutedAction)
+        if (lastInvocation != null) {
+          executeAgainstSelectedChangeLists(lastInvocation)
         }
       }
 
       void update(AnActionEvent e) {
-        if( lastExecutedAction != null ){
-          // that's pretty big property path, might be nice to add a
-          // name property to the invocation, it could then show you things
-          // like the changelist the command was executed against!
-          e.presentation.text =
-            "Re-execute $lastExecutedAction.action.command.name"
+        if( lastInvocation != null ){
+          e.presentation.text = "Re-execute $lastInvocation.description"
           e.presentation.enabled = true
         }
         else {
@@ -196,14 +193,13 @@ class ClaCommandExecutionManager {
       init()
     }
 
-    lastExecutedAction = invocation
+    lastInvocation = invocation
 
     if( invocation.action.command.clearConsole ){
       consoleView.clear()
     }
 
-    ChangeList[] selectedChangelists =
-      ClaUtil.getSelectedChangelists(invocation.actionEvent.dataContext)
+    ChangeList[] selectedChangelists = invocation.changeLists
     if( selectedChangelists.length == 0 ){
       log.warn "selected changelists collection is empty - how does this happen?"
       return 
@@ -212,10 +208,6 @@ class ClaCommandExecutionManager {
     selectedChangelists.each {
       execute(invocation, it)
     }
-
-//    ChangeList changeList = selectedChangelists[0]
-//    execute(invocation, changeList)
-
   }
 
   private execute(ClaActionInvocation invocation, ChangeList changeList) {
@@ -251,6 +243,12 @@ class ClaCommandExecutionManager {
       catch (all) {
         consoleLn "[$timestamp] could not execute: $all"
       }
+    }
+  }
+
+  void commandUpdated(ClaCommand oldCommand, ClaCommand newCommand) {
+    if( lastInvocation?.action?.command == oldCommand ){
+      lastInvocation.action.command = newCommand
     }
   }
 }

@@ -173,6 +173,14 @@ implements
     XmlSerializerUtil.copyBean(state, this.state)
   }
 
+  /**
+   * This method is called by the configurator when a command is edited.
+   * Doing all this shennanigans makes me think the command config edit
+   * acition should just edit the members and fire an update event or something.
+   */
+  void commandUpdated(ClaCommand oldCommand, ClaCommand newCommand) {
+    executionManager.commandUpdated(oldCommand, newCommand)
+  }
 }
 
 
