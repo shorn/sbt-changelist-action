@@ -170,7 +170,7 @@ class TablePanel {
 
   private addRow() {
     ClaCommandConfigurator editForm =
-      new ClaCommandConfigurator(this.projectComponent.project).init()
+      new ClaCommandConfigurator(this.projectComponent).init()
     boolean okButtonPressed =
       editForm.showAsIdeaDialog("Add renderer")
 
@@ -209,7 +209,7 @@ class TablePanel {
     int selectedRow = table.selectedRow;
 
     ClaCommandConfigurator editForm =
-      new ClaCommandConfigurator(this.projectComponent.project).init();
+      new ClaCommandConfigurator(this.projectComponent).init();
     editForm.updatePanelFieldsFromObject(commands.get(selectedRow));
 
     boolean userPressedOk =

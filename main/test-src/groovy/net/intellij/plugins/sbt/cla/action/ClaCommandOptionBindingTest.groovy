@@ -1,15 +1,13 @@
 package net.intellij.plugins.sbt.cla.action
 
 import org.junit.Test
-import java.lang.reflect.Method
-import org.junit.Assert
 import junit.framework.AssertionFailedError
 
 class ClaCommandOptionBindingTest {
 
   @Test
   void testListProperties(){
-    ClaCommandOptionBinding binding = new ClaCommandOptionBinding()
+    ClaCommandOptionBinding binding = new ClaCommandOptionBinding(null)
 
     assertContains(binding.optionsDocs, "helloWorld", "say hello to the world")
   }

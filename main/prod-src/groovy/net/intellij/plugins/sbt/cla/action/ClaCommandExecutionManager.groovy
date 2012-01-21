@@ -31,6 +31,7 @@ import com.intellij.execution.process.ProcessOutput
 import com.intellij.openapi.vfs.CharsetToolkit
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.vcs.changes.ChangeList
 
 class ClaCommandExecutionManager {
   private final Logger log = Logger.getInstance(getClass())
@@ -44,7 +45,7 @@ class ClaCommandExecutionManager {
   ToolWindow toolWindow;
 
   // saved by execute()
-  ClaCommandPopupMenuAction lastExecutedAction
+  ClaActionInvocation lastExecutedAction
 
 
   ClaCommandExecutionManager(ClaProjectComponent projectComponent) {
@@ -109,6 +110,7 @@ class ClaCommandExecutionManager {
       ClaUtil.getIcon16())
     {
       void actionPerformed(AnActionEvent anActionEvent) {
+        // not sure if I should replace the invocation event with this one or not
         if (lastExecutedAction != null) {
           execute(lastExecutedAction)
         }
@@ -116,7 +118,10 @@ class ClaCommandExecutionManager {
 
       void update(AnActionEvent e) {
         if( lastExecutedAction != null ){
-          e.presentation.text = "Re-execute $lastExecutedAction.command.name"
+          // that's pretty big property path, might be nice to add a
+          // name property to the invocation, it could then show you things
+          // like the changelist the command was executed against!
+          e.presentation.text = "Re-execute $lastExecutedAction.action.command.name"
           e.presentation.enabled = true
         }
         else {
@@ -174,22 +179,34 @@ class ClaCommandExecutionManager {
     consoleView.print("$output\n", ConsoleViewContentType.NORMAL_OUTPUT)
   }
   
-  void execute(ClaCommandPopupMenuAction action){
+  void execute(ClaActionInvocation invocation){
     if( consoleView == null ){
       init()
     }
 
-    lastExecutedAction = action
+    lastExecutedAction = invocation
 
-    if( action.command.clearConsole ){
+    if( invocation.action.command.clearConsole ){
       consoleView.clear()
     }
 
+    ChangeList[] selectedChangelists =
+      ClaUtil.getSelectedChangelists(invocation.actionEvent.dataContext)
+    if( selectedChangelists.length == 0 ){
+      log.warn "selected changelists collection is empty - how does this happen?"
+      return 
+    }
+    ChangeList changeList = selectedChangelists[0]
+    
     GeneralCommandLine commandLine = new GeneralCommandLine()
-    commandLine.exePath = action.command.command
+    commandLine.exePath = invocation.action.command.command
+    ClaCommandOptionBinding optionBinding =
+      new ClaCommandOptionBinding(projectComponent)
+
+    optionBinding.setChangeList(changeList)
     try {
       commandLine.addParameters(
-        new ClaCommandOptionBinding().parseOptions(action.command.options) )
+        optionBinding.parseOptions(invocation.action.command.options) )
     }
     catch( all ){
       consoleLn(all.toString())

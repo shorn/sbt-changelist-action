@@ -41,7 +41,8 @@ class ClaCommandPopupMenuAction extends AnAction {
 
   void actionPerformed(AnActionEvent e) {
     log.debug "actionPerformed() on thread $ClaUtil.threadName"
-    projectComponent.executionManager.execute(this)
+    projectComponent.executionManager.execute(
+      new ClaActionInvocation(action: this, actionEvent: e) )
 
 
 //    DataContext dataContext = e.getDataContext();

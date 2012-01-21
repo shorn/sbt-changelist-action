@@ -30,6 +30,7 @@ import javax.swing.JTextArea
 
 import com.intellij.ui.components.JBScrollPane
 import net.intellij.plugins.sbt.cla.util.ClaUtil
+import net.intellij.plugins.sbt.cla.ClaProjectComponent
 
 /**
  * could use some validation
@@ -39,7 +40,7 @@ import net.intellij.plugins.sbt.cla.util.ClaUtil
 class ClaCommandConfigurator {
   private final Logger log = Logger.getInstance(getClass())
 
-  Project project
+  ClaProjectComponent projectComponent
 
   JPanel panel
   JTextField name
@@ -50,8 +51,8 @@ class ClaCommandConfigurator {
   JComboBox filePaths
   JCheckBox console
 
-  ClaCommandConfigurator(Project project){
-    this.project = project;
+  ClaCommandConfigurator(ClaProjectComponent projectComponent){
+    this.projectComponent = projectComponent;
   }
   
   ClaCommandConfigurator init(){
@@ -69,15 +70,11 @@ class ClaCommandConfigurator {
     commandButton.addBrowseFolderListener(
       "thetitle",
       "thedesc",
-      project,
+      projectComponent.project,
       FileChooserDescriptorFactory.createSingleFileDescriptor(null))
-
     optionHelperButton = new SwingBuilder().button(
       icon: ClaUtil.icon16,
-      actionPerformed: {optionHelperPressed()}
-    )
-
-    
+      actionPerformed: {optionHelperPressed()} )
     filePaths = new JComboBox(ClaCommand.PathFormat.enumConstants)
     
     filePaths.setRenderer(new SimpleComboRenderer<ClaCommand.PathFormat>(){
@@ -144,7 +141,14 @@ class ClaCommandConfigurator {
   void optionHelperPressed() {
     log.debug "optionHelperPressed"
 
-    ClaCommandOptionBinding optionBinding = new ClaCommandOptionBinding()
+
+    ClaCommandOptionBinding optionBinding =
+      new ClaCommandOptionBinding(projectComponent){
+        @Override
+        String getChangeListString() {
+          return "changelist file"
+        }
+      }
 
     List result = null
     def error = null
@@ -175,7 +179,7 @@ class ClaCommandConfigurator {
 
     ComponentPopupBuilder builder = JBPopupFactory.getInstance().
       createComponentPopupBuilder(contentPanel, contentPanel);
-    builder.setProject(project).
+    builder.setProject(projectComponent.project).
       createPopup().showUnderneathOf(optionHelperButton)
   }
 
@@ -184,7 +188,8 @@ class ClaCommandConfigurator {
    * @return true if user pressed ok button
    */
   boolean showAsIdeaDialog(String title){
-    DialogWrapper dialogWrapper = new IdeaDialogWrapper(project, title);
+    DialogWrapper dialogWrapper =
+      new IdeaDialogWrapper(projectComponent.project, title);
 
     dialogWrapper.setResizable(true)
 

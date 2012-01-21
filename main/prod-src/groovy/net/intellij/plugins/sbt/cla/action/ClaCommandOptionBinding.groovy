@@ -9,9 +9,23 @@ import java.lang.annotation.RetentionPolicy
 import java.lang.annotation.ElementType
 import java.lang.reflect.Method
 import java.lang.annotation.Annotation
+import net.intellij.plugins.sbt.cla.ClaProjectComponent
+import com.intellij.openapi.vcs.changes.ChangeListManager
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vcs.changes.ChangeList
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.vcs.VcsDataKeys
+import net.intellij.plugins.sbt.cla.util.ClaUtil
 
 class ClaCommandOptionBinding {
   private final Logger log = Logger.getInstance(getClass())
+
+  ClaProjectComponent projectComponent
+  ChangeList changeList
+
+  ClaCommandOptionBinding(ClaProjectComponent projectComponent) {
+    this.projectComponent = projectComponent
+  }
 
   /**
    * This method doesn't do any exception handling, especially
@@ -36,6 +50,7 @@ class ClaCommandOptionBinding {
         }
       }
     }
+    binding.setVariable("changeList", changeList)
 
     GroovyShell shell = new GroovyShell(binding)
 
@@ -117,6 +132,13 @@ class ClaCommandOptionBinding {
   String getFlibble(){
     return "wibble"
   }
+  
+  @OptionBinding("get the list of changes")
+  String getChangeListString(){
+    List<VirtualFile> files = ClaUtil.getChangelistFiles(changeList)
+    return files.join(" ")
+  }
+
 
 
 }
