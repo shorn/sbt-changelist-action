@@ -28,23 +28,33 @@ import com.intellij.execution.ui.ConsoleViewContentType
 
 import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.execution.process.ProcessOutput
-import com.intellij.openapi.vfs.CharsetToolkit
+
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.vcs.changes.ChangeList
 
+/**
+ * At the moment, all process write to the same tool window.
+ * It probably makes sense to break out seperate executions of an invocation
+ * into their own tab or something. The single consoleView is mostly annoying
+ * because when you invoke on multiple changesets, seach command is executed
+ * in a separate thread and their output ends up being interleaved.
+ * I think the consoleView println method is threadsafe (I think) it's just
+ * confusing as hell to try and read the output.
+ */
 class ClaCommandExecutionManager {
   private final Logger log = Logger.getInstance(getClass())
-  private static String TOOL_WINDOW_ID = "CLA Console";
+  private static String TOOL_WINDOW_ID = "CLA Console"
 
   // assigned in ctor
   ClaProjectComponent projectComponent
 
-  // lazy, by init() method first time execute() is called
-  ConsoleView consoleView;
-  ToolWindow toolWindow;
+  // lazy, by init() method first time executeAgainstSelectedChangeLists()
+  // is called
+  ConsoleView consoleView
+  ToolWindow toolWindow
 
-  // saved by execute()
+  // saved by executeAgainstSelectedChangeLists()
   ClaActionInvocation lastExecutedAction
 
 
@@ -110,9 +120,10 @@ class ClaCommandExecutionManager {
       ClaUtil.getIcon16())
     {
       void actionPerformed(AnActionEvent anActionEvent) {
-        // not sure if I should replace the invocation event with this one or not
+        // not sure if I should replace the invocation event or not,
+        // maybe this is what causes the empty changelist problem?
         if (lastExecutedAction != null) {
-          execute(lastExecutedAction)
+          executeAgainstSelectedChangeLists(lastExecutedAction)
         }
       }
 
@@ -121,7 +132,8 @@ class ClaCommandExecutionManager {
           // that's pretty big property path, might be nice to add a
           // name property to the invocation, it could then show you things
           // like the changelist the command was executed against!
-          e.presentation.text = "Re-execute $lastExecutedAction.action.command.name"
+          e.presentation.text =
+            "Re-execute $lastExecutedAction.action.command.name"
           e.presentation.enabled = true
         }
         else {
@@ -179,7 +191,7 @@ class ClaCommandExecutionManager {
     consoleView.print("$output\n", ConsoleViewContentType.NORMAL_OUTPUT)
   }
   
-  void execute(ClaActionInvocation invocation){
+  void executeAgainstSelectedChangeLists(ClaActionInvocation invocation){
     if( consoleView == null ){
       init()
     }
@@ -196,8 +208,17 @@ class ClaCommandExecutionManager {
       log.warn "selected changelists collection is empty - how does this happen?"
       return 
     }
-    ChangeList changeList = selectedChangelists[0]
-    
+
+    selectedChangelists.each {
+      execute(invocation, it)
+    }
+
+//    ChangeList changeList = selectedChangelists[0]
+//    execute(invocation, changeList)
+
+  }
+
+  private execute(ClaActionInvocation invocation, ChangeList changeList) {
     GeneralCommandLine commandLine = new GeneralCommandLine()
     commandLine.exePath = invocation.action.command.command
     ClaCommandOptionBinding optionBinding =
@@ -206,31 +227,30 @@ class ClaCommandExecutionManager {
     optionBinding.setChangeList(changeList)
     try {
       commandLine.addParameters(
-        optionBinding.parseOptions(invocation.action.command.options) )
+        optionBinding.parseOptions(invocation.action.command.options))
     }
-    catch( all ){
+    catch (all) {
       consoleLn(all.toString())
       return
     }
 //    commandLine.setWorkDirectory(...)
 
     consoleLn "[$timestamp] executing $commandLine.commandLineString"
-    ApplicationManager.application.executeOnPooledThread{
+    ApplicationManager.application.executeOnPooledThread {
       try {
         Process process = commandLine.createProcess()
 
         CapturingProcessHandler processHandler =
           new CapturingProcessHandler(
             process,
-            CharsetToolkit.getDefaultSystemCharset());
+            groovy.util.CharsetToolkit.getDefaultSystemCharset());
         consoleView.attachToProcess(processHandler);
         ProcessOutput processOutput = processHandler.runProcess();
         consoleLn "[$timestamp] command returned: $processOutput.exitCode"
       }
-      catch( all ){
+      catch (all) {
         consoleLn "[$timestamp] could not execute: $all"
       }
     }
-
   }
 }

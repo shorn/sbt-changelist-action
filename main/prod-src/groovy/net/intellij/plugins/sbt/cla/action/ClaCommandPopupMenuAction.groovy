@@ -41,33 +41,8 @@ class ClaCommandPopupMenuAction extends AnAction {
 
   void actionPerformed(AnActionEvent e) {
     log.debug "actionPerformed() on thread $ClaUtil.threadName"
-    projectComponent.executionManager.execute(
+    projectComponent.executionManager.executeAgainstSelectedChangeLists(
       new ClaActionInvocation(action: this, actionEvent: e) )
-
-
-//    DataContext dataContext = e.getDataContext();
-//    Project project = DataKeys.PROJECT.getData(dataContext);
-
-    // test
-//    Messages.showMessageDialog(
-//      project,
-//      formatCommandWithOptions(),
-//      "Information",
-//      Messages.getInformationIcon());
-
-    // prod
-//    ChangeList[] selectedChangelists = ChangelistUtil.getSelectedChangelists(
-//      dataContext);
-//    for( ChangeList iChangeList : selectedChangelists ){
-//      ChangelistActionComponent.invokeAction(
-//        project,
-//        iChangeList.getName(),
-//        ChangelistUtil.getChangelistFiles(iChangeList),
-//        formatCommandWithOptions(),
-//        projectComponent.getState().absolutePath,
-//        projectComponent.getState().clearConsole);
-//    }
-
   }
 
   String formatCommandWithOptions() {
