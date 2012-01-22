@@ -1,0 +1,7 @@
+
+task testEcho << {
+  def result = exec{
+    commandLine = ["/bin/echo", "wibble"]
+  }
+  println "result: ${result.inspect()}"
+}

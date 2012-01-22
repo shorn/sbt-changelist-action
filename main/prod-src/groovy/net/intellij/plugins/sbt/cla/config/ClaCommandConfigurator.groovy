@@ -160,13 +160,12 @@ class ClaCommandConfigurator {
 
   ClaCommandOptionBinding getOptionBinding(){
     if( optionBinding == null ){
-      ClaCommandOptionBinding optionBinding =
-        new ClaCommandOptionBinding(projectComponent){
-          @Override
-          String getChangeListString() {
-            return "changelist file"
-          }
+      optionBinding = new ClaCommandOptionBinding(projectComponent){
+        @Override
+        String getChangeListString() {
+          return "changelist file"
         }
+      }
     }
 
     return optionBinding
