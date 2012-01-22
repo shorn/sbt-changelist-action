@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="jgoodies-forms">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../main/lib/jgoodies-common-1.2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../../main/lib/jgoodies-forms-1.4.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$USER_HOME$/jvm/jgoodies-forms-1.4.2/src/core" />
+      <root url="file://$USER_HOME$/jvm/jgoodies-forms-1.4.2/src/extras" />
+      <root url="file://$USER_HOME$/jvm/jgoodies-forms-1.4.2/src/test" />
+    </SOURCES>
+  </library>
+</component>
