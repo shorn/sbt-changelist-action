@@ -54,18 +54,6 @@ class ClaUtil {
     return VcsDataKeys.CHANGE_LISTS.getData(dataContext);
   }
 
-  public static List<VirtualFile> getChangelistFiles(ChangeList iChangeList) {
-    List<Change> changes = new ArrayList<Change>(iChangeList.getChanges());
-
-    return Lists.transform(
-      changes,
-      new Function<Change, VirtualFile>() {
-        public VirtualFile apply(Change change) {
-          return change.getVirtualFile();
-        }
-      });
-  }
-
   /**
    * creates a unique list of filenames from the given changelist files.
    *

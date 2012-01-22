@@ -11,12 +11,12 @@ import java.lang.reflect.Method
 
 import net.intellij.plugins.sbt.cla.ClaProjectComponent
 
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vcs.changes.ChangeList
 
 import net.intellij.plugins.sbt.cla.util.ClaUtil
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.roots.ProjectFileIndex
+import com.intellij.openapi.vfs.VirtualFile
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
@@ -147,25 +147,19 @@ class ClaCommandOptionBinding {
     changeList
   }
 
-  @OptionBinding("say hello to the world")
-  String getHelloWorld(){
-    "hello World"
-  }
-
-  @OptionBinding("doco")
-  String getChangeListFile(){
+  @OptionBinding("returns the name of a temp file containing a line for each changed file relative to contentRoot[0]")
+  String getChangeListRelativeFile(){
     return ClaUtil.writeLnToTempFile(getChangesRelativeToFirstContentRoot()).path
   }
 
-  @OptionBinding("doco")
+  @OptionBinding("returns List<String> of file paths relative to contentRoots[0]")
   List<String> getChangesRelativeToFirstContentRoot() {
-    changeList.changes*.virtualFile.path*.minus(rootManager.contentRoots[0].path + '/')
+    changeList.changes*.virtualFile.path*.minus(contentRoots[0].path + '/')
   }
 
   @OptionBinding("get the list of changes as a single space separated string")
   String getChangeListString(){
-    List<VirtualFile> files = ClaUtil.getChangelistFiles(changeList)
-    return files.join(" ")
+    changeList.changes*.virtualFile.join(" ")
   }
 
   @OptionBinding("com.intellij.openapi.roots.ProjectRootManager")
@@ -175,9 +169,12 @@ class ClaCommandOptionBinding {
   
   @OptionBinding("com.intellij.openapi.roots.ProjectFileIndex")
   ProjectFileIndex getFileIndex(){
-    ProjectFileIndex index = rootManager.getFileIndex()
+    return rootManager.fileIndex
+  }
 
-    return index
+  @OptionBinding("com.intellij.openapi.roots.ProjectFileIndex")
+  VirtualFile[] getContentRoots(){
+    return rootManager.contentRoots
   }
 
 
