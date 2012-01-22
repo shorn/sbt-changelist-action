@@ -135,15 +135,15 @@ class ClaUtil {
     name = name.replace("_-_", "-" );
 
 
-    return name;
+    return name
   }
 
   /**
    * write the content to a temp file, one per line
    * @return the file written to (already closed), or null if any error.
    */
-  public static File writeToTempFile(Collection<String> content) {
-    String contentString = Joiner.on(LINE_SEPARATOR).join(content);
+  static File writeLnToTempFile(List<String> content) {
+    String contentString = content.join(LINE_SEPARATOR)
 
     File temp;
     try {

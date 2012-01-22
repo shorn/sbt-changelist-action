@@ -1,7 +1,16 @@
 
-task testEcho << {
-  def result = exec{
+task listChangeFiles << {
+  String changeListFile = System.getProperty("changeListFile")
+  println "changeListFile: $changeListFile}"
+
+  File changedFiles = file(changeListFile)
+
+  exec{
     commandLine = ["/bin/echo", "wibble"]
   }
-  println "result: ${result.inspect()}"
+
+  changedFiles.eachLine{
+    println it
+  }
+
 }

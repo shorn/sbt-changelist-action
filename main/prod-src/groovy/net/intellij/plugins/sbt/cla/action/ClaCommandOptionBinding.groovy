@@ -38,7 +38,7 @@ class ClaCommandOptionBinding {
   ClaCommandOptionBinding(ClaProjectComponent projectComponent) {
     this.projectComponent = projectComponent
   }
-
+  
   /**
    * This method doesn't do any exception handling, especially
    * {@link GroovyShell#evaluate} exceptions are propogated.
@@ -62,7 +62,6 @@ class ClaCommandOptionBinding {
         }
       }
     }
-    binding.setVariable("changeList", changeList)
 
     GroovyShell shell = new GroovyShell(binding)
 
@@ -98,6 +97,14 @@ class ClaCommandOptionBinding {
     return optionsResult
   }
 
+  /**
+   * When resolving names used in options scripts, this will be called first
+   * and will resolve to any property method on this class that is annotated
+   * with {@link OptionBinding}.
+   *
+   * @return null if coudln't find any appriately named property that is marked,
+   * or if the porperty getter itself returns null.
+   */
   Object getBindingOptionValue(String varName){
     Method m = null
     ClaUtil.getMethodsForPropertiesWithAnnotation(
@@ -129,16 +136,32 @@ class ClaCommandOptionBinding {
     return result
   }
 
+  @OptionBinding(
+  "any of the static methods on net.intellij.plugins.sbt.cla.util.ClaUtil")
+  Class<ClaUtil> getUtil(){
+    ClaUtil
+  }
+
+  @OptionBinding("com.intellij.openapi.vcs.changes.ChangeList")
+  ChangeList getChangeList(){
+    changeList
+  }
+
   @OptionBinding("say hello to the world")
   String getHelloWorld(){
     "hello World"
   }
 
-  @OptionBinding("wibble")
-  String getFlibble(){
-    return "wibble"
+  @OptionBinding("doco")
+  String getChangeListFile(){
+    return ClaUtil.writeLnToTempFile(getChangesRelativeToFirstContentRoot()).path
   }
-  
+
+  @OptionBinding("doco")
+  List<String> getChangesRelativeToFirstContentRoot() {
+    changeList.changes*.virtualFile.path*.minus(rootManager.contentRoots[0].path + '/')
+  }
+
   @OptionBinding("get the list of changes as a single space separated string")
   String getChangeListString(){
     List<VirtualFile> files = ClaUtil.getChangelistFiles(changeList)
