@@ -185,8 +185,20 @@ class ClaCommandExecutionManager {
   }
 
   void editLastInvocation() {
+
+    if( lastInvocation == null ){
+      return // totally defensive, never actually seen it happen
+    }
+
     ClaCommandConfigurator editForm =
       new ClaCommandConfigurator(this.projectComponent).init()
+
+    if( lastInvocation.changeLists.length ){
+      // allows user to test with the first changeList
+      // from their last invocation
+      editForm.optionBinding = new ClaCommandOptionBinding(projectComponent)
+      editForm.optionBinding.changeList = lastInvocation.changeLists[0]
+    }
 
     editForm.updatePanelFieldsFromObject(lastInvocation.action.command)
 
@@ -203,16 +215,15 @@ class ClaCommandExecutionManager {
   {
     ToolWindow window = toolWindowManager.registerToolWindow(
       TOOL_WINDOW_ID, true, ToolWindowAnchor.BOTTOM)
-    ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-    Content content = contentFactory.createContent(panel, "", false);
 
-    content.setCloseable(false);
+    ContentFactory contentFactory = ContentFactory.SERVICE.instance
+    Content content = contentFactory.createContent(panel, "", false)
 
-    window.getContentManager().addContent(content);
+    content.closeable = false
+    window.contentManager.addContent(content)
+    window.icon = ClaUtil.icon16
 
-    window.setIcon( ClaUtil.getIcon16() );
-
-    return window;
+    return window
   }
 
   String getTimestamp(){
@@ -231,7 +242,7 @@ class ClaCommandExecutionManager {
     lastInvocation = invocation
 
     if( invocation.action.command.clearConsole ){
-      // obviously, this is pretty "racy" for multiple executions -
+      // Obviously, this is pretty "racy" for multiple executions -
       // either initiated multiple times by the user or because of
       // multi-changelst selection, later executions are going to clear
       // output in "last-wins" fashion
@@ -241,7 +252,8 @@ class ClaCommandExecutionManager {
     ChangeList[] selectedChangelists = invocation.changeLists
     if( selectedChangelists.length == 0 ){
       // I've seen this happen once when invoction a command on the
-      // "unversioned files" section of the changes view
+      // "unversioned files" section of the changes view and once when
+      // "re-invoking" after making major changelist changes
       log.warn "selected changelists collection is empty - how did this happen?"
       return 
     }
@@ -253,14 +265,14 @@ class ClaCommandExecutionManager {
 
   private execute(ClaActionInvocation invocation, ChangeList changeList) {
 
-    projectComponent.project.getBaseDir()
-
     GeneralCommandLine commandLine = new GeneralCommandLine()
     commandLine.exePath = invocation.action.command.command
+    commandLine.setWorkDirectory(invocation.action.command.workingDir)
+
     ClaCommandOptionBinding optionBinding =
       new ClaCommandOptionBinding(projectComponent)
-
     optionBinding.setChangeList(changeList)
+
     try {
       commandLine.addParameters(
         optionBinding.parseOptions(invocation.action.command.options))
@@ -269,7 +281,6 @@ class ClaCommandExecutionManager {
       consoleLn(all.toString())
       return
     }
-//    commandLine.setWorkDirectory(...)
 
     consoleLn "[$timestamp] executing $commandLine.commandLineString"
     ApplicationManager.application.executeOnPooledThread {

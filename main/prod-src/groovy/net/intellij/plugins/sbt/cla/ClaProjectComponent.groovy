@@ -194,6 +194,7 @@ class ClaCommand {
   boolean clearConsole
   String name
   String command
+  String workingDir
   String options
 
   static enum PathFormat {

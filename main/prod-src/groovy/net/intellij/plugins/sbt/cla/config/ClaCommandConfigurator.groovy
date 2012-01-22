@@ -1,36 +1,30 @@
 package net.intellij.plugins.sbt.cla.config
 
-import javax.swing.JTextField
-import javax.swing.JPanel
-import com.jgoodies.forms.layout.FormLayout
-import com.jgoodies.forms.layout.CellConstraints
-import javax.swing.JLabel
-
-import com.intellij.openapi.ui.TextFieldWithBrowseButton
-
-import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.openapi.project.Project
-import javax.swing.JComponent
-import net.intellij.plugins.sbt.cla.ClaCommand
-
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import javax.swing.JCheckBox
-import javax.swing.JComboBox
-import net.intellij.plugins.sbt.cla.util.SimpleComboRenderer
 import com.intellij.openapi.diagnostic.Logger
-import javax.swing.JButton
-import groovy.swing.SwingBuilder
-
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder
 import com.intellij.openapi.ui.popup.JBPopupFactory
-
-import com.intellij.util.ui.UIUtil
-import net.intellij.plugins.sbt.cla.action.ClaCommandOptionBinding
-import javax.swing.JTextArea
-
 import com.intellij.ui.components.JBScrollPane
-import net.intellij.plugins.sbt.cla.util.ClaUtil
+import com.intellij.util.ui.UIUtil
+import com.jgoodies.forms.layout.CellConstraints
+import com.jgoodies.forms.layout.FormLayout
+import groovy.swing.SwingBuilder
+import javax.swing.JButton
+import javax.swing.JCheckBox
+import javax.swing.JComboBox
+import javax.swing.JComponent
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JTextArea
+import javax.swing.JTextField
+import net.intellij.plugins.sbt.cla.ClaCommand
 import net.intellij.plugins.sbt.cla.ClaProjectComponent
+import net.intellij.plugins.sbt.cla.action.ClaCommandOptionBinding
+import net.intellij.plugins.sbt.cla.util.ClaUtil
+import net.intellij.plugins.sbt.cla.util.SimpleComboRenderer
 
 /**
  * could use some validation
@@ -42,12 +36,24 @@ class ClaCommandConfigurator {
 
   ClaProjectComponent projectComponent
 
+  /**
+   * Client code may set this, in which case whatever is set will be used.
+   * If nothing has been set, the first time this is used a new optionBinding
+   * will be created with a "mock" changeList binding.
+   */
+  ClaCommandOptionBinding optionBinding
+
+
   JPanel panel
   JTextField name
   JTextField command
+  JTextField workingDir
   JTextArea options
+
+  TextFieldWithBrowseButton workingDirButton
   TextFieldWithBrowseButton commandButton
   JButton optionHelperButton
+
   JComboBox filePaths
   JCheckBox console
 
@@ -65,16 +71,25 @@ class ClaCommandConfigurator {
     panel = new JPanel()
     name = new JTextField()
     command = new JTextField()
+    workingDir = new JTextField()
     options = new JTextArea()
+
     commandButton = new TextFieldWithBrowseButton(command)
     commandButton.addBrowseFolderListener(
-      "thetitle",
-      "thedesc",
+      "title",
+      "desc",
       projectComponent.project,
       FileChooserDescriptorFactory.createSingleFileDescriptor(null))
+    workingDirButton = new TextFieldWithBrowseButton(workingDir)
+    workingDirButton.addBrowseFolderListener(
+      "title",
+      "desc",
+      projectComponent.project,
+      FileChooserDescriptorFactory.createSingleFolderDescriptor())
     optionHelperButton = new SwingBuilder().button(
       icon: ClaUtil.icon16,
       actionPerformed: {optionHelperPressed()} )
+
     filePaths = new JComboBox(ClaCommand.PathFormat.enumConstants)
     
     filePaths.setRenderer(new SimpleComboRenderer<ClaCommand.PathFormat>(){
@@ -95,72 +110,83 @@ class ClaCommandConfigurator {
   void layoutComponents(){
     FormLayout layout = new FormLayout(
       "pref, [200dlu,pref,600dlu]:grow, pref",
-      "default, default, default, default, default")
+      "default, default, default, default, default, default")
     panel.setLayout(layout)
     CellConstraints cc = new CellConstraints()
 
-
+    // more than 4 or 5 rows is too many, start using a builder pattern
     panel.add(new JLabel("Name:"), cc.xy(1, 1))
     panel.add(name, cc.xy(2, 1))
     panel.add(new JLabel("Action:"), cc.xy(1, 2))
     panel.add(command, cc.xy(2, 2))
     panel.add(commandButton, cc.xy(3, 2))
-    panel.add(new JLabel("Option:"), cc.xy(1, 3))
+    panel.add(new JLabel("Working Directory:"), cc.xy(1, 3))
+    panel.add(workingDir, cc.xy(2, 3))
+    panel.add(workingDirButton, cc.xy(3, 3))
+
+    panel.add(new JLabel("Option:"), cc.xy(1, 4))
 
     options.setRows(5)
-    panel.add(new JBScrollPane(options), cc.xy(2, 3))
-    panel.add(optionHelperButton, cc.xy(3, 3, "left, bottom"))
+    panel.add(new JBScrollPane(options), cc.xy(2, 4))
+    panel.add(optionHelperButton, cc.xy(3, 4, "left, bottom"))
 
-    panel.add(new JLabel("Filenames:"), cc.xy(1, 4))
-    panel.add(filePaths, cc.xy(2, 4))
+    panel.add(new JLabel("Filenames:"), cc.xy(1, 5))
+    panel.add(filePaths, cc.xy(2, 5))
     panel.add(
       new JLabel(
         text: "Clear console:",
         toolTipText: "Clear the console before the command is executed" ),
-      cc.xy(1, 5) )
-    panel.add(console, cc.xy(2, 5))
+      cc.xy(1, 6) )
+    panel.add(console, cc.xy(2, 6))
   }
 
   void updatePanelFieldsFromObject(ClaCommand c) {
     name.text = c.name
     command.text = c.command
+    workingDir.text = c.workingDir
     options.text = c.options
     filePaths.selectedItem = c.filenames
     console.selected = c.clearConsole
   }
 
-
   void updateObjectFromPanelFields(ClaCommand c) {
     c.name = name.text
     c.command = command.text
+    c.workingDir = workingDir.text
     c.options = options.text
     c.filenames = filePaths.selectedItem as ClaCommand.PathFormat
     c.clearConsole = console.selected
+  }
+
+  ClaCommandOptionBinding getOptionBinding(){
+    if( optionBinding == null ){
+      ClaCommandOptionBinding optionBinding =
+        new ClaCommandOptionBinding(projectComponent){
+          @Override
+          String getChangeListString() {
+            return "changelist file"
+          }
+        }
+    }
+
+    return optionBinding
   }
 
   void optionHelperPressed() {
     log.debug "optionHelperPressed"
 
 
-    ClaCommandOptionBinding optionBinding =
-      new ClaCommandOptionBinding(projectComponent){
-        @Override
-        String getChangeListString() {
-          return "changelist file"
-        }
-      }
-
     List result = null
     def error = null
     try {
-      result = optionBinding.parseOptions(options.text)
+      result = getOptionBinding().parseOptions(options.text)
     }
     catch( all ){
       error = all
     }
 
     StringBuilder doco = new StringBuilder()
-    optionBinding.optionsDocs.each{ name, doc ->
+    getOptionBinding().optionsDocs.each{ name, doc ->
       doco << "$name - $doc <br>"
     }
     doco << "<hr>"
