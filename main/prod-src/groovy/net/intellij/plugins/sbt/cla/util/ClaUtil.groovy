@@ -111,7 +111,7 @@ class ClaUtil {
    * this could be better, maybe replace all alhpa-numerics?
    *
    */
-  public static String createFilenameFromChangelistName(String changelistName){
+  public static String cleanFilename(String changelistName){
     String name = changelistName.replace(" ", "_");
     name = name.replace(",", "");
     name = name.replace("/", "_");

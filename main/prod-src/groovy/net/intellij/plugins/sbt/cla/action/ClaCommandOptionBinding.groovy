@@ -76,8 +76,9 @@ class ClaCommandOptionBinding {
   private List<String> flattenEvalResult(evalResults) {
     log.debug("options eval: $evalResults")
     if (!evalResults instanceof List) {
+      // or, we could just call toString on whatever it is
       throw new OptionParsingException(
-        "options must evaluate to a String<List>, but got: $evalResults")
+        "options must evaluate to a List, but got: $evalResults")
     }
 
     List<String> optionsResult = []
@@ -86,6 +87,8 @@ class ClaCommandOptionBinding {
         return
       }
       if (evalResult instanceof Iterable) {
+        // using Iterable even turns strings into list so of chars,
+        // that's no good
         ((Iterable) evalResult).each {
           optionsResult << it.toString()
         }
@@ -136,8 +139,7 @@ class ClaCommandOptionBinding {
     return result
   }
 
-  @OptionBinding(
-  "any of the static methods on net.intellij.plugins.sbt.cla.util.ClaUtil")
+  @OptionBinding("any of the static methods on net.intellij.plugins.sbt.cla.util.ClaUtil")
   Class<ClaUtil> getUtil(){
     ClaUtil
   }
