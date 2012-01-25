@@ -174,8 +174,8 @@ implements
   }
 
   /**
-   * This method is called by the configurator when a command is edited.
-   * Doing all this shennanigans makes me think the command config edit
+   * This method is called by the configurator when a executable is edited.
+   * Doing all this shennanigans makes me think the executable config edit
    * acition should just edit the members and fire an update event or something.
    */
   void commandUpdated(ClaCommand oldCommand, ClaCommand newCommand) {
@@ -193,7 +193,7 @@ class ClaCommand {
   PathFormat filenames
   boolean clearConsole
   String name
-  String command
+  String executable
   String workingDir
   String options
 

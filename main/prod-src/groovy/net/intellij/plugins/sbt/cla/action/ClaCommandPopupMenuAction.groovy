@@ -9,7 +9,7 @@ import net.intellij.plugins.sbt.cla.ClaCommand
 import com.intellij.openapi.diagnostic.Logger
 
 /**
- * this needs work, need to separate the concept of command, popup and action.
+ * this needs work, need to separate the concept of executable, popup and action.
  * this conflates them all at the moment.  maybe see if i can come up with an
  * elegant solution using groovy mixin/trait thingies?
  */
@@ -47,7 +47,7 @@ class ClaCommandPopupMenuAction extends AnAction {
   }
 
   String formatCommandWithOptions() {
-    return "$command.command $command.options"
+    return "$command.executable $command.options"
   }
 
   @Override

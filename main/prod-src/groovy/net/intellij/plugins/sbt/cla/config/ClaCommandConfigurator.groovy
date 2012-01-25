@@ -25,8 +25,7 @@ import net.intellij.plugins.sbt.cla.ClaProjectComponent
 import net.intellij.plugins.sbt.cla.action.ClaCommandOptionBinding
 import net.intellij.plugins.sbt.cla.util.ClaUtil
 import net.intellij.plugins.sbt.cla.util.SimpleComboRenderer
-import com.intellij.openapi.fileTypes.FileType
-import com.intellij.openapi.fileTypes.FileTypes
+
 import java.awt.Dimension
 import com.intellij.openapi.util.SystemInfo
 
@@ -145,14 +144,14 @@ class ClaCommandConfigurator {
     panel.add(
       new JLabel(
         text: "Clear console:",
-        toolTipText: "Clear the console before the command is executed" ),
+        toolTipText: "Clear the console before the executable is executed" ),
       cc.xy(1, 6) )
     panel.add(console, cc.xy(2, 6))
   }
 
   void updatePanelFieldsFromObject(ClaCommand c) {
     name.text = c.name
-    command.text = c.command
+    command.text = c.executable
     workingDir.text = c.workingDir
     options.text = c.options
     filePaths.selectedItem = c.filenames
@@ -161,7 +160,7 @@ class ClaCommandConfigurator {
 
   void updateObjectFromPanelFields(ClaCommand c) {
     c.name = name.text
-    c.command = command.text
+    c.executable = command.text
     c.workingDir = workingDir.text
     c.options = options.text
     c.filenames = filePaths.selectedItem as ClaCommand.PathFormat

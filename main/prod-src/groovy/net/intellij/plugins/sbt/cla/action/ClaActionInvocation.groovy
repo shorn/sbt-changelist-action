@@ -5,13 +5,13 @@ import com.intellij.openapi.vcs.changes.ChangeList
 import net.intellij.plugins.sbt.cla.util.ClaUtil
 
 /**
- * represents an invocation of a particular command via an action.
+ * represents an invocation of a particular executable via an action.
  * The actionEvent data context may indicated mutiple changesets.
  * This is a just quick hack, needs a lot more thought about the
  * best way to represent this.  I don't want to bind the OptionBinding and
  * AnActionEvent classes to gether, but the option binding/execution manager
  * needs access to
- * the context of the command invocation (for getting changelists etc).
+ * the context of the executable invocation (for getting changelists etc).
  * Needs more thought - just going to ahck something together for the moment
  * and see what emerges.
  */

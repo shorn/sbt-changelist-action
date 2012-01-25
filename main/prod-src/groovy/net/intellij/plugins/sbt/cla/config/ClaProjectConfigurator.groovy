@@ -72,7 +72,7 @@ class TablePanel {
   private static String[] columnLabels = [
     "Name", "Command", "Options"]
   private static String[] columnProps = [
-    "name", "command", "options"]
+    "name", "executable", "options"]
 
   ClaProjectComponent projectComponent
   JPanel panel
@@ -172,7 +172,7 @@ class TablePanel {
     ClaCommandConfigurator editForm =
       new ClaCommandConfigurator(this.projectComponent).init()
     boolean okButtonPressed =
-      editForm.showAsIdeaDialog("Add command")
+      editForm.showAsIdeaDialog("Add executable")
 
     if (okButtonPressed) {
       ClaCommand cmd = new ClaCommand()
@@ -215,16 +215,16 @@ class TablePanel {
     editForm.updatePanelFieldsFromObject(oldCommand);
 
     boolean userPressedOk =
-      editForm.showAsIdeaDialog("Edit command");
+      editForm.showAsIdeaDialog("Edit executable");
     if( userPressedOk ){
       // we use a new object so that comparing the list from the project state
       // and the table list  (for "isModified") will come up with false in
-      // the case of a single command being edited
+      // the case of a single executable being edited
       ClaCommand newCommand = new ClaCommand()
       editForm.updateObjectFromPanelFields(newCommand);
       
       if( oldCommand == newCommand ){
-        log.info "command was not changed, leaving the old command in place"
+        log.info "executable was not changed, leaving the old executable in place"
       }
       else {
         commands.set(selectedRow, newCommand);

@@ -39,7 +39,7 @@ import net.intellij.plugins.sbt.cla.config.ClaCommandConfigurator
  * At the moment, all processes write to the same tool window.
  * It probably makes sense to break out seperate executions of an invocation
  * into their own tab or something. The single consoleView is mostly annoying
- * because when you invoke on multiple changesets, each command is executed
+ * because when you invoke on multiple changesets, each executable is executed
  * in a separate thread and their output ends up being interleaved.
  * I think the consoleView println method is threadsafe (I think) it's just
  * confusing as hell to try and read the output.
@@ -135,7 +135,7 @@ class ClaCommandExecutionManager {
           e.presentation.enabled = true
         }
         else {
-          e.presentation.text = "Re-execute last command"
+          e.presentation.text = "Re-execute last executable"
           e.presentation.enabled = false
         }
       }
@@ -144,7 +144,7 @@ class ClaCommandExecutionManager {
     actionGroup.add(
       new AnAction(
         "Edit",
-        "Edit last command",
+        "Edit last executable",
         ClaUtil.getIcon("cog16.png")) {
         public void actionPerformed(AnActionEvent anActionEvent) {
           editLastInvocation();
@@ -156,7 +156,7 @@ class ClaCommandExecutionManager {
             e.presentation.enabled = true
           }
           else {
-            e.presentation.text = "Edit last command"
+            e.presentation.text = "Edit last executable"
             e.presentation.enabled = false
           }
         }
@@ -202,7 +202,7 @@ class ClaCommandExecutionManager {
 
     editForm.updatePanelFieldsFromObject(lastInvocation.action.command)
 
-    boolean userPressedOk = editForm.showAsIdeaDialog("Edit command")
+    boolean userPressedOk = editForm.showAsIdeaDialog("Edit executable")
     if( userPressedOk ){
       editForm.updateObjectFromPanelFields(lastInvocation.action.command)
     }
@@ -251,7 +251,7 @@ class ClaCommandExecutionManager {
 
     ChangeList[] selectedChangelists = invocation.changeLists
     if( selectedChangelists.length == 0 ){
-      // I've seen this happen once when invoction a command on the
+      // I've seen this happen once when invoction a executable on the
       // "unversioned files" section of the changes view and once when
       // "re-invoking" after making major changelist changes
       log.warn "selected changelists collection is empty - how did this happen?"
@@ -266,7 +266,7 @@ class ClaCommandExecutionManager {
   private execute(ClaActionInvocation invocation, ChangeList changeList) {
 
     GeneralCommandLine commandLine = new GeneralCommandLine()
-    commandLine.exePath = invocation.action.command.command
+    commandLine.exePath = invocation.action.command.executable
     commandLine.setWorkDirectory(invocation.action.command.workingDir)
 
     ClaCommandOptionBinding optionBinding =
@@ -293,7 +293,7 @@ class ClaCommandExecutionManager {
             groovy.util.CharsetToolkit.getDefaultSystemCharset());
         consoleView.attachToProcess(processHandler);
         ProcessOutput processOutput = processHandler.runProcess();
-        consoleLn "[$timestamp] command returned: $processOutput.exitCode"
+        consoleLn "[$timestamp] executable returned: $processOutput.exitCode"
       }
       catch( all ){
         consoleLn "[$timestamp] could not execute: $all"
