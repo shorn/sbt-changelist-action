@@ -172,7 +172,7 @@ class TablePanel {
     ClaCommandConfigurator editForm =
       new ClaCommandConfigurator(this.projectComponent).init()
     boolean okButtonPressed =
-      editForm.showAsIdeaDialog("Add renderer")
+      editForm.showAsIdeaDialog("Add command")
 
     if (okButtonPressed) {
       ClaCommand cmd = new ClaCommand()
