@@ -25,6 +25,8 @@ import net.intellij.plugins.sbt.cla.ClaProjectComponent
 import net.intellij.plugins.sbt.cla.action.ClaCommandOptionBinding
 import net.intellij.plugins.sbt.cla.util.ClaUtil
 import net.intellij.plugins.sbt.cla.util.SimpleComboRenderer
+import com.intellij.openapi.fileTypes.FileType
+import com.intellij.openapi.fileTypes.FileTypes
 
 /**
  * could use some validation
@@ -79,7 +81,7 @@ class ClaCommandConfigurator {
       "title",
       "desc",
       projectComponent.project,
-      FileChooserDescriptorFactory.createSingleFileDescriptor(null))
+      FileChooserDescriptorFactory.createSingleLocalFileDescriptor() )
     workingDirButton = new TextFieldWithBrowseButton(workingDir)
     workingDirButton.addBrowseFolderListener(
       "title",
