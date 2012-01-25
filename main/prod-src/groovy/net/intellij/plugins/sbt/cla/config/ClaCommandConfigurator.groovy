@@ -27,6 +27,8 @@ import net.intellij.plugins.sbt.cla.util.ClaUtil
 import net.intellij.plugins.sbt.cla.util.SimpleComboRenderer
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.FileTypes
+import java.awt.Dimension
+import com.intellij.openapi.util.SystemInfo
 
 /**
  * could use some validation
@@ -90,7 +92,13 @@ class ClaCommandConfigurator {
       FileChooserDescriptorFactory.createSingleFolderDescriptor())
     optionHelperButton = new SwingBuilder().button(
       icon: ClaUtil.icon16,
-      actionPerformed: {optionHelperPressed()} )
+      actionPerformed: {optionHelperPressed()}
+    )
+
+    // button was too wide on windows, we'll see what it looks like on OS X
+    if( SystemInfo.isWindows ){
+      optionHelperButton.preferredSize = new Dimension(ClaUtil.icon16.iconWidth+4, ClaUtil.icon16.iconHeight+4)
+    }
 
     filePaths = new JComboBox(ClaCommand.PathFormat.enumConstants)
     
