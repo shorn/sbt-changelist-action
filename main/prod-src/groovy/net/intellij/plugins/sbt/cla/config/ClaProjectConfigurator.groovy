@@ -26,6 +26,8 @@ import net.intellij.plugins.sbt.cla.ClaProjectComponent
 import com.intellij.openapi.diagnostic.Logger
 
 import groovy.swing.SwingBuilder
+import com.intellij.openapi.vcs.changes.ChangeListManager
+import net.intellij.plugins.sbt.cla.action.ClaCommandOptionBinding
 
 class ClaProjectConfigurator {
   private final Logger log = Logger.getInstance(getClass())
@@ -169,10 +171,9 @@ class TablePanel {
   }
 
   private addRow() {
-    ClaCommandConfigurator editForm =
-      new ClaCommandConfigurator(this.projectComponent).init()
+    ClaCommandConfigurator editForm = createCommandConfigurator()
     boolean okButtonPressed =
-      editForm.showAsIdeaDialog("Add executable")
+      editForm.showAsIdeaDialog("Add command")
 
     if (okButtonPressed) {
       ClaCommand cmd = new ClaCommand()
@@ -180,6 +181,21 @@ class TablePanel {
       commands.add(cmd)
       selectedRow = table.rowCount - 1
     }
+  }
+
+  private ClaCommandConfigurator createCommandConfigurator() {
+    ClaCommandConfigurator editForm =
+      new ClaCommandConfigurator(this.projectComponent).init()
+
+    ChangeListManager clMgr =
+      ChangeListManager.getInstance(projectComponent.project)
+
+    if( clMgr.defaultChangeList ){
+      editForm.optionBinding = new ClaCommandOptionBinding(projectComponent)
+      editForm.optionBinding.changeList = clMgr.defaultChangeList
+    }
+
+    return editForm
   }
 
   private removeSelectedRow() {
@@ -208,23 +224,22 @@ class TablePanel {
 
     int selectedRow = table.selectedRow;
 
-    ClaCommandConfigurator editForm =
-      new ClaCommandConfigurator(this.projectComponent).init();
+    ClaCommandConfigurator editForm = createCommandConfigurator()
 
     ClaCommand oldCommand = commands.get(selectedRow)
     editForm.updatePanelFieldsFromObject(oldCommand);
 
     boolean userPressedOk =
-      editForm.showAsIdeaDialog("Edit executable");
+      editForm.showAsIdeaDialog("Edit command");
     if( userPressedOk ){
       // we use a new object so that comparing the list from the project state
       // and the table list  (for "isModified") will come up with false in
-      // the case of a single executable being edited
+      // the case of a single command being edited
       ClaCommand newCommand = new ClaCommand()
       editForm.updateObjectFromPanelFields(newCommand);
       
       if( oldCommand == newCommand ){
-        log.info "executable was not changed, leaving the old executable in place"
+        log.info "command was not changed, leaving the old command in place"
       }
       else {
         commands.set(selectedRow, newCommand);

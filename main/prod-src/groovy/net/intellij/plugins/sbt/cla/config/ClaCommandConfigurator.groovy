@@ -28,6 +28,7 @@ import net.intellij.plugins.sbt.cla.util.SimpleComboRenderer
 
 import java.awt.Dimension
 import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.vcs.changes.ChangeListManager
 
 /**
  * could use some validation
@@ -93,10 +94,12 @@ class ClaCommandConfigurator {
       icon: ClaUtil.icon16,
       actionPerformed: {optionHelperPressed()}
     )
+    optionHelperButton.enabled = optionBinding != null
 
     // button was too wide on windows, we'll see what it looks like on OS X
     if( SystemInfo.isWindows ){
-      optionHelperButton.preferredSize = new Dimension(ClaUtil.icon16.iconWidth+4, ClaUtil.icon16.iconHeight+4)
+      optionHelperButton.preferredSize =
+        new Dimension(ClaUtil.icon16.iconWidth+4, ClaUtil.icon16.iconHeight+4)
     }
 
     filePaths = new JComboBox(ClaCommand.PathFormat.enumConstants)
@@ -167,17 +170,9 @@ class ClaCommandConfigurator {
     c.clearConsole = console.selected
   }
 
-  ClaCommandOptionBinding getOptionBinding(){
-    if( optionBinding == null ){
-      optionBinding = new ClaCommandOptionBinding(projectComponent){
-        @Override
-        String getChangeListString() {
-          return "changelist file"
-        }
-      }
-    }
-
-    return optionBinding
+  void setOptionBinding(ClaCommandOptionBinding optionBinding) {
+    this.optionBinding = optionBinding
+    optionHelperButton.enabled = optionBinding!= null
   }
 
   void optionHelperPressed() {
