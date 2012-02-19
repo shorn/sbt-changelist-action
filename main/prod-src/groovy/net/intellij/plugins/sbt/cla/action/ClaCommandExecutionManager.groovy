@@ -277,8 +277,9 @@ class ClaCommandExecutionManager {
       commandLine.addParameters(
         optionBinding.parseOptions(invocation.action.command.options))
     }
-    catch (all) {
+    catch (Throwable all) {
       consoleLn(all.toString())
+      all.printStackTrace()
       return
     }
 
