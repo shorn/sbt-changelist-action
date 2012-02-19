@@ -17,6 +17,7 @@ import net.intellij.plugins.sbt.cla.util.ClaUtil
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vcs.changes.Change
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
@@ -62,10 +63,19 @@ class ClaCommandOptionBinding {
         }
       }
     }
+    binding.setVariable("bind", this)
 
     GroovyShell shell = new GroovyShell(binding)
 
-    def evalResults = shell.evaluate(options)
+    def evalResults = null
+    try {
+      evalResults = shell.evaluate(options)
+    }
+    catch( all ){
+      println "error in evaluation: $all"
+      all.printStackTrace()
+      throw all
+    }
 
     return flattenEvalResult(evalResults)
   }
@@ -74,7 +84,7 @@ class ClaCommandOptionBinding {
    * This method could get very fancy if it wanted
    */
   private List<String> flattenEvalResult(evalResults) {
-    log.debug("options eval: $evalResults")
+//    log.debug("options eval: $evalResults")
     if (!evalResults instanceof List) {
       // or, we could just call toString on whatever it is
       throw new OptionParsingException(
@@ -113,7 +123,7 @@ class ClaCommandOptionBinding {
     ClaUtil.getMethodsForPropertiesWithAnnotation(
       ClaCommandOptionBinding, OptionBinding).each
       { propName, method ->
-        log.debug "$varName - $propName"
+//        log.debug "$varName - $propName"
         if( propName == varName ){
           m = method
         }
@@ -150,13 +160,36 @@ class ClaCommandOptionBinding {
   }
 
   @OptionBinding("returns the name of a temp file containing a line for each changed file relative to contentRoot[0]")
-  String getChangeListRelativeFile(){
-    return ClaUtil.writeLnToTempFile(getChangesRelativeToFirstContentRoot()).path
+  String getChangeListRelativeFile(Integer contentRootIndex = null){
+    return ClaUtil.writeLnToTempFile(getChangesRelativeToContentRoot(contentRootIndex)).path
   }
 
-  @OptionBinding("returns List<String> of file paths relative to contentRoots[0]")
-  List<String> getChangesRelativeToFirstContentRoot() {
-    changeList.changes*.virtualFile.path*.minus(contentRoots[0].path + '/')
+  @OptionBinding("returns List<String> of file paths relative to the indicated content root")
+  List<String> getChangesRelativeToContentRoot(
+    Integer contentRootIndex = null,
+    boolean includeDeleted=false)
+  {
+    changeList.changes.findAll { it.type != Change.Type.DELETED }.collect {
+      getRelativePath(it, contentRootIndex)
+    }
+  }
+
+  public String getRelativePath(Change change, Integer contentRootIndex = null){
+    change.virtualFile.path -
+      (getContentRoot(change.virtualFile, contentRootIndex).path+'/')
+  }
+
+  public VirtualFile getContentRoot(
+    VirtualFile file,
+    Integer contentRootIndex = null)
+  {
+    assert file, "virtual file may not be null"
+    if( contentRootIndex == null ){
+      return fileIndex.getContentRootForFile(file)
+    }
+    else {
+      return contentRoots[contentRootIndex]
+    }
   }
 
   @OptionBinding("get the list of changes as a single space separated string")

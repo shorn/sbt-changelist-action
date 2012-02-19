@@ -1,7 +1,7 @@
 
 task listChangeFiles << {
   String changeListFile = System.getProperty("changeListFile")
-  println "changeListFile: $changeListFile}"
+  println "changeListFile: $changeListFile"
 
   File changedFiles = file(changeListFile)
 
