@@ -190,23 +190,11 @@ class ClaState {
 
 
 class ClaCommand {
-  PathFormat filenames
   boolean clearConsole
   String name
   String executable
   String workingDir
   String options
-
-  static enum PathFormat {
-    ABSOLUTE("Absolute"),
-    RELATIVE("Relative")
-
-    String description
-
-    PathFormat(String description) {
-      this.description = description
-    }
-  }
 }
 
 

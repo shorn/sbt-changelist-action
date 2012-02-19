@@ -58,7 +58,6 @@ class ClaCommandConfigurator {
   TextFieldWithBrowseButton commandButton
   JButton optionHelperButton
 
-  JComboBox filePaths
   JCheckBox console
 
   ClaCommandConfigurator(ClaProjectComponent projectComponent){
@@ -96,19 +95,11 @@ class ClaCommandConfigurator {
     )
     optionHelperButton.enabled = optionBinding != null
 
-    // button was too wide on windows, we'll see what it looks like on OS X
+    // button was too wide on windows
     if( SystemInfo.isWindows ){
       optionHelperButton.preferredSize =
         new Dimension(ClaUtil.icon16.iconWidth+4, ClaUtil.icon16.iconHeight+4)
     }
-
-    filePaths = new JComboBox(ClaCommand.PathFormat.enumConstants)
-    
-    filePaths.setRenderer(new SimpleComboRenderer<ClaCommand.PathFormat>(){
-      String getNonNullString(ClaCommand.PathFormat value) {
-        return value.description
-      }
-    })
 
     console = new JCheckBox(selected: true)
   }
@@ -121,8 +112,8 @@ class ClaCommandConfigurator {
    */
   void layoutComponents(){
     FormLayout layout = new FormLayout(
-      "pref, [200dlu,pref,600dlu]:grow, pref",
-      "default, default, default, default, default, default")
+      "right:pref, [200dlu,pref,600dlu]:grow, pref",
+      "default, default, default, default, default")
     panel.setLayout(layout)
     CellConstraints cc = new CellConstraints()
 
@@ -142,14 +133,12 @@ class ClaCommandConfigurator {
     panel.add(new JBScrollPane(options), cc.xy(2, 4))
     panel.add(optionHelperButton, cc.xy(3, 4, "left, bottom"))
 
-    panel.add(new JLabel("Filenames:"), cc.xy(1, 5))
-    panel.add(filePaths, cc.xy(2, 5))
     panel.add(
       new JLabel(
         text: "Clear console:",
         toolTipText: "Clear the console before the executable is executed" ),
-      cc.xy(1, 6) )
-    panel.add(console, cc.xy(2, 6))
+      cc.xy(1, 5) )
+    panel.add(console, cc.xy(2, 5))
   }
 
   void updatePanelFieldsFromObject(ClaCommand c) {
@@ -157,7 +146,6 @@ class ClaCommandConfigurator {
     command.text = c.executable
     workingDir.text = c.workingDir
     options.text = c.options
-    filePaths.selectedItem = c.filenames
     console.selected = c.clearConsole
   }
 
@@ -166,7 +154,6 @@ class ClaCommandConfigurator {
     c.executable = command.text
     c.workingDir = workingDir.text
     c.options = options.text
-    c.filenames = filePaths.selectedItem as ClaCommand.PathFormat
     c.clearConsole = console.selected
   }
 

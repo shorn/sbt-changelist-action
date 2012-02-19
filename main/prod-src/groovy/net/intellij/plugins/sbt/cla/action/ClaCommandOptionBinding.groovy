@@ -67,7 +67,7 @@ class ClaCommandOptionBinding {
 
     GroovyShell shell = new GroovyShell(binding)
 
-    def evalResults = null
+    def evalResults
     try {
       evalResults = shell.evaluate(options)
     }
