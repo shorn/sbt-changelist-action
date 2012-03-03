@@ -191,7 +191,7 @@ class ClaCommandOptionBinding {
    * something like that.
    */
   @OptionBinding("return a List<String> of file paths of each change relative to the contentRoot indicated")
-  List<String> getChangesRelativeToContentRoot(int contentRootIndex) {
+  List<String> getRelativePaths(int contentRootIndex) {
     VirtualFile root = contentRoots[contentRootIndex]
 
     return changeList.changes.collect { Change change ->
@@ -221,9 +221,8 @@ class ClaCommandOptionBinding {
   }
 
   @OptionBinding("returns the absolute filename of a file containing the list of paths (relative to the indicated contentRoot) of files in the changelist")
-  String getChangeListRelativeFile(int contentRootIndex){
-    List<String> relativeChanges =
-      getChangesRelativeToContentRoot(contentRootIndex)
+  String getRelativePathsFile(int contentRootIndex){
+    List<String> relativeChanges = getRelativePaths(contentRootIndex)
     return ClaUtil.writeLnToTempFile(relativeChanges).path
   }
 
