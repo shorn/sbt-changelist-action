@@ -41,9 +41,8 @@ class ClaCommandConfigurator {
   ClaProjectComponent projectComponent
 
   /**
-   * Client code may set this, in which case whatever is set will be used.
-   * If nothing has been set, the first time this is used a new optionBinding
-   * will be created with a "mock" changeList binding.
+   * if this is null, the optionHelperButton won't be enabled -
+   * it's up to the caller to set this to something that makes sense.
    */
   ClaCommandOptionBinding optionBinding
 
@@ -108,7 +107,7 @@ class ClaCommandConfigurator {
    * The "600dlu" max for the middle column could probably use a better value,
    * maybe make sure the dialog is not wider than the display or something?
    * Note that the [X, Y, Z] colspec requires a recent version of formlayout
-   * - more recent than the one packaged with IDEA at least.
+   * - more recent than the one packaged with IDEA 11.x at least.
    */
   void layoutComponents(){
     FormLayout layout = new FormLayout(
@@ -165,7 +164,6 @@ class ClaCommandConfigurator {
   void optionHelperPressed() {
     log.debug "optionHelperPressed"
 
-
     List result = null
     def error = null
     try {
@@ -194,7 +192,7 @@ class ClaCommandConfigurator {
     contentPanel.add( new JLabel(content) )
 
     ComponentPopupBuilder builder = JBPopupFactory.getInstance().
-      createComponentPopupBuilder(contentPanel, contentPanel);
+      createComponentPopupBuilder(contentPanel, contentPanel)
     builder.setProject(projectComponent.project).
       createPopup().showUnderneathOf(optionHelperButton)
   }

@@ -16,6 +16,10 @@ import com.intellij.openapi.diagnostic.Logger
 import java.lang.reflect.Method
 import java.lang.annotation.Annotation
 
+/**
+ * Lot of stuff in here was just lifted from the java version, needs
+ * groovification.
+ */
 class ClaUtil {
   private final static Logger log = Logger.getInstance(ClaUtil)
 
@@ -28,7 +32,9 @@ class ClaUtil {
 
 
   static final Map<String, Icon> icons = [:]
-  
+
+  // thinka bout factoring out an icon-related class instead of calling
+  // this method all over the place with hardcoded strings
   static Icon getIcon(String name){
     if( icons[name] == null ){
       icons[name] = new ImageIcon(ClaUtil.getResource("$ICON_LOCATION/$name"))
@@ -153,8 +159,7 @@ class ClaUtil {
     String propName,
     Class<?> propType)
   {
-    String getterName = MetaProperty.getGetterName(
-      propName, propType)
+    String getterName = MetaProperty.getGetterName(propName, propType)
     clazz.getMethod(getterName, [] as Class[])
   }
 

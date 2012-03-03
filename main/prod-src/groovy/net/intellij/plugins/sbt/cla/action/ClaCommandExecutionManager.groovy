@@ -38,10 +38,14 @@ import net.intellij.plugins.sbt.cla.config.ClaCommandConfigurator
 /**
  * At the moment, all processes write to the same tool window.
  * It probably makes sense to break out seperate executions of an invocation
- * into their own tab or something. The single consoleView is mostly annoying
+ * into their own tab or something (although, thinking about it, that would
+ * kind of suck for execution against a large number of changelists, but then
+ * again so will the current behaviour).
+ *
+ * The single consoleView is mostly annoying
  * because when you invoke on multiple changesets, each executable is executed
  * in a separate thread and their output ends up being interleaved.
- * I think the consoleView println method is threadsafe (I think) it's just
+ * I think the consoleView println method is threadsafe it's just
  * confusing as hell to try and read the output.
  */
 class ClaCommandExecutionManager {
@@ -51,12 +55,12 @@ class ClaCommandExecutionManager {
   // assigned in ctor
   ClaProjectComponent projectComponent
 
-  // lazy, by init() method first time executeAgainstSelectedChangeLists()
+  // lazy, by init() method first time executeAgainstChangeLists()
   // is called
   ConsoleView consoleView
   ToolWindow toolWindow
 
-  // saved by executeAgainstSelectedChangeLists()
+  // saved by executeAgainstChangeLists()
   ClaActionInvocation lastInvocation
 
 
@@ -125,7 +129,7 @@ class ClaCommandExecutionManager {
         // not sure if I should replace the invocation event or not,
         // maybe this is what causes the empty changelist problem?
         if (lastInvocation != null) {
-          executeAgainstSelectedChangeLists(lastInvocation)
+          executeAgainstChangeLists(lastInvocation)
         }
       }
 
@@ -234,7 +238,7 @@ class ClaCommandExecutionManager {
     consoleView.print("$output\n", ConsoleViewContentType.NORMAL_OUTPUT)
   }
   
-  void executeAgainstSelectedChangeLists(ClaActionInvocation invocation){
+  void executeAgainstChangeLists(ClaActionInvocation invocation){
     if( consoleView == null ){
       init()
     }
@@ -264,7 +268,6 @@ class ClaCommandExecutionManager {
   }
 
   private execute(ClaActionInvocation invocation, ChangeList changeList) {
-
     GeneralCommandLine commandLine = new GeneralCommandLine()
     commandLine.exePath = invocation.action.command.executable
     commandLine.setWorkDirectory(invocation.action.command.workingDir)
@@ -291,9 +294,9 @@ class ClaCommandExecutionManager {
         CapturingProcessHandler processHandler =
           new CapturingProcessHandler(
             process,
-            groovy.util.CharsetToolkit.getDefaultSystemCharset());
-        consoleView.attachToProcess(processHandler);
-        ProcessOutput processOutput = processHandler.runProcess();
+            groovy.util.CharsetToolkit.getDefaultSystemCharset())
+        consoleView.attachToProcess(processHandler)
+        ProcessOutput processOutput = processHandler.runProcess()
         consoleLn "[$timestamp] executable returned: $processOutput.exitCode"
       }
       catch( all ){

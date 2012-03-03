@@ -25,10 +25,7 @@ class ClaCommandPopupMenuAction extends AnAction {
     ClaCommand command,
     String id)
   {
-    super(
-      command.name,
-      "",  // description
-      ClaUtil.icon16 )
+    super(command.name, "",  ClaUtil.icon16)
     this.projectComponent = projectComponent
     this.command = command
     this.id = id
@@ -42,7 +39,7 @@ class ClaCommandPopupMenuAction extends AnAction {
   @Override
   void actionPerformed(AnActionEvent e) {
     log.debug "actionPerformed() on thread $ClaUtil.threadName"
-    projectComponent.executionManager.executeAgainstSelectedChangeLists(
+    projectComponent.executionManager.executeAgainstChangeLists(
       new ClaActionInvocation(action: this, actionEvent: e) )
   }
 
