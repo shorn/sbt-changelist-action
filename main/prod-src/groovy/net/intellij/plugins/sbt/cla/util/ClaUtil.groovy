@@ -128,7 +128,6 @@ class ClaUtil {
     // which turns in to "PTR_-_1234", blech
     name = name.replace("_-_", "-" );
 
-
     return name
   }
 
@@ -152,7 +151,6 @@ class ClaUtil {
     }
     return temp;
   }
-
 
   static Method getMethodForProperty(
     Class<?> clazz,
