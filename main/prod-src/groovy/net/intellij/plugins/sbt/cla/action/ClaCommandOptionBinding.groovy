@@ -18,6 +18,8 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vcs.changes.Change
+import com.intellij.openapi.vcs.changes.ContentRevision
+import static com.intellij.openapi.vcs.changes.Change.Type.DELETED
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
@@ -159,40 +161,7 @@ class ClaCommandOptionBinding {
     changeList
   }
 
-  @OptionBinding("returns the name of a temp file containing a line for each changed file relative to contentRoot[0]")
-  String getChangeListRelativeFile(Integer contentRootIndex = null){
-    return ClaUtil.writeLnToTempFile(getChangesRelativeToContentRoot(contentRootIndex)).path
-  }
-
-  @OptionBinding("returns List<String> of file paths relative to the indicated content root")
-  List<String> getChangesRelativeToContentRoot(
-    Integer contentRootIndex = null,
-    boolean includeDeleted=false)
-  {
-    changeList.changes.findAll { it.type != Change.Type.DELETED }.collect {
-      getRelativePath(it, contentRootIndex)
-    }
-  }
-
-  public String getRelativePath(Change change, Integer contentRootIndex = null){
-    change.virtualFile.path -
-      (getContentRoot(change.virtualFile, contentRootIndex).path+'/')
-  }
-
-  public VirtualFile getContentRoot(
-    VirtualFile file,
-    Integer contentRootIndex = null)
-  {
-    assert file, "virtual file may not be null"
-    if( contentRootIndex == null ){
-      return fileIndex.getContentRootForFile(file)
-    }
-    else {
-      return contentRoots[contentRootIndex]
-    }
-  }
-
-  @OptionBinding("get the list of changes as a single space separated string")
+  @OptionBinding("get the list of changes as a single space separated string.  Absolute paths, deleted files not included.")
   String getChangeListString(){
     changeList.changes*.virtualFile.join(" ")
   }
@@ -212,6 +181,51 @@ class ClaCommandOptionBinding {
     return rootManager.contentRoots
   }
 
+  /**
+   * this will return the path of all changes relative to the contentRoot
+   * indicated.
+   * The if any change in the current changeList does not actually live
+   * under the contentRoot indicated, the path returned will be the absolute
+   * path.  If you need to deal with changelists consisting of changes that
+   * cross contentRoots, you'll have to filter changes by contentRoot or
+   * something like that.
+   */
+  @OptionBinding("return a List<String> of file paths of each change relative to the contentRoot indicated")
+  List<String> getChangesRelativeToContentRoot(int contentRootIndex) {
+    VirtualFile root = contentRoots[contentRootIndex]
+
+    return changeList.changes.collect { Change change ->
+      // the "-'/'" chops off any beginning slash because the paths
+      // we want to return are relative
+      return getContentRevision(change).file.path - root.getPath() - '/'
+    }
+  }
+
+  /**
+   * Tries to get a content revision from a file, prefers the "afterRevision"
+   * but if that's not available (because file was deleted)
+   * will return the "beforeRevsion".
+   *
+   * @param change may not be null
+   * @return may return null if both content revisions on the
+   * given change are null
+   */
+  ContentRevision getContentRevision(Change change){
+    if (change.type == DELETED) {
+      return change.beforeRevision
+    }
+    else {
+      return change.afterRevision
+    }
+
+  }
+
+  @OptionBinding("returns the absolute filename of a file containing the list of paths (relative to the indicated contentRoot) of files in the changelist")
+  String getChangeListRelativeFile(int contentRootIndex){
+    List<String> relativeChanges =
+      getChangesRelativeToContentRoot(contentRootIndex)
+    return ClaUtil.writeLnToTempFile(relativeChanges).path
+  }
 
 
 }

@@ -110,7 +110,7 @@ implements
   // ---------- Configurable ----------
 
   String getDisplayName() {
-    return "SBT Change List Action"
+    return "SBT ChangeListAction"
   }
 
   // need to hook up the help up to a wiki topic at some point

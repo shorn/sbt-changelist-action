@@ -1,6 +1,6 @@
 <!--suppress XmlUnboundNsPrefix -->
 <idea-plugin version="2">
-  <name>SBT Changelist action</name>
+  <name>SBT ChangeListAction</name>
   <description>
     Provides the ability to define custom actions that you can invoke on
     any VCS changelist (via the context menu).
