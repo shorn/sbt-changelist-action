@@ -43,8 +43,15 @@ class ClaCommandOptionBinding {
   }
   
   /**
+   * Takes the given "options script" and executes it to return a list of
+   * Stirng parameters that will be passed to the command to execute.
+   *
    * This method doesn't do any exception handling, especially
    * {@link GroovyShell#evaluate} exceptions are propogated.
+   *
+   * Note also that the actual results of the script execution will be passed
+   * through the {@link #flattenEvalResult} method in order to turn anything
+   * that's not a string into a string.
    *
    * @throws OptionParsingException if the expression doesn't evaluate
    * to a list
@@ -83,7 +90,9 @@ class ClaCommandOptionBinding {
   }
 
   /**
-   * This method could get very fancy if it wanted
+   * This method could get very fancy if it wanted, but it's very simple at
+   * the moment, it just adds the elements of any contained list to the
+   * original list in place of itself.
    */
   private List<String> flattenEvalResult(evalResults) {
 //    log.debug("options eval: $evalResults")
