@@ -1,12 +1,16 @@
 <!--suppress XmlUnboundNsPrefix -->
-<idea-plugin version="2">
+<idea-plugin url="http://bitbucket.org/shorn/sbt-changelist-action/wiki/Home">
   <name>SBT ChangeListAction</name>
   <description>
     Provides the ability to define custom actions that you can invoke on
-    any VCS changelist (via the context menu).
+    any VCS changelist (via the right-click context menu).
+    There's some basic documentation available at the homepage.
   </description>
   <version>0.1</version>
-  <vendor>Shorn</vendor>
+  <vendor email="cla-shorn@sneakemail.com"
+          logo="/net/intellij/plugins/sbt/cla/icons/frog16.png">
+    Shorn Tolley
+  </vendor>
   <idea-version since-build="8000"/>
 
   <application-components>
@@ -24,10 +28,4 @@
       </implementation-class>
     </component>
   </project-components>
-
-  <actions>
-  </actions>
-
-  <extensions defaultExtensionNs="com.intellij">
-  </extensions>
 </idea-plugin>
