@@ -119,14 +119,14 @@ class ClaCommandConfigurator {
     // more than 4 or 5 rows is too many, start using a builder pattern
     panel.add(new JLabel("Name:"), cc.xy(1, 1))
     panel.add(name, cc.xy(2, 1))
-    panel.add(new JLabel("Action:"), cc.xy(1, 2))
+    panel.add(new JLabel("Command:"), cc.xy(1, 2))
     panel.add(command, cc.xy(2, 2))
     panel.add(commandButton, cc.xy(3, 2))
     panel.add(new JLabel("Working Directory:"), cc.xy(1, 3))
     panel.add(workingDir, cc.xy(2, 3))
     panel.add(workingDirButton, cc.xy(3, 3))
 
-    panel.add(new JLabel("Option:"), cc.xy(1, 4))
+    panel.add(new JLabel("Options:"), cc.xy(1, 4))
 
     options.setRows(5)
     panel.add(new JBScrollPane(options), cc.xy(2, 4))
