@@ -3,15 +3,29 @@
   <name>SBT ChangeListAction</name>
   <description>
     Provides the ability to define custom actions that you can invoke on
-    any VCS changelist (via the right-click context menu).
-    There's some basic documentation available at the homepage.
+    any VCS changelist in order to execute OS commands against the changelist
+    content.
+    There's documentation available at the homepage.
   </description>
-  <version>0.1</version>
+  <version>1.0</version>
   <vendor email="cla-shorn@sneakemail.com"
           logo="/net/intellij/plugins/sbt/cla/icons/frog16.png">
     Shorn Tolley
   </vendor>
-  <idea-version since-build="8000"/>
+
+  <idea-version since-build="117.418"/>
+  <change-notes><![CDATA[
+    <p>1.0</p>
+    <ul>
+      <li>recompiled with IDEA 11.1.2</li>
+    </ul>
+    <p>0.1</p>
+    <ul>
+      <li>initial version published</li>
+    </ul>
+  ]]>
+  </change-notes>
+
 
   <application-components>
     <component>
