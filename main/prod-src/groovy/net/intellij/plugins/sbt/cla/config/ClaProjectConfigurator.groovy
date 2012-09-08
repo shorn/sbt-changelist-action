@@ -229,8 +229,7 @@ class TablePanel {
     ClaCommand oldCommand = commands.get(selectedRow)
     editForm.updatePanelFieldsFromObject(oldCommand);
 
-    boolean userPressedOk =
-      editForm.showAsIdeaDialog("Edit command");
+    boolean userPressedOk = editForm.showAsIdeaDialog("Edit command");
     if( userPressedOk ){
       // we use a new object so that comparing the list from the project state
       // and the table list  (for "isModified") will come up with false in

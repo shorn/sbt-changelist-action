@@ -139,6 +139,9 @@ class ClaCommandConfigurator {
     panel.add(console, cc.xy(2, 5))
   }
 
+  /**
+   * copies data from the given command into the input fields.
+   */
   void updatePanelFieldsFromObject(ClaCommand c) {
     name.text = c.name
     command.text = c.executable
@@ -147,6 +150,9 @@ class ClaCommandConfigurator {
     console.selected = c.clearConsole
   }
 
+  /**
+   * copies data from the input fields into a command object
+   */
   void updateObjectFromPanelFields(ClaCommand c) {
     c.name = name.text
     c.executable = command.text
@@ -157,7 +163,6 @@ class ClaCommandConfigurator {
 
   void setOptionBinding(ClaCommandOptionBinding optionBinding) {
     this.optionBinding = optionBinding
-    optionHelperButton.enabled = optionBinding!= null
   }
 
   void optionHelperPressed() {
@@ -201,12 +206,24 @@ class ClaCommandConfigurator {
    * @return true if user pressed ok button
    */
   boolean showAsIdeaDialog(String title){
+
+    // I don't want to think about the "right" time to do this, so I'm just
+    // doing it here at the last possible moment :)
+    if (optionBinding) {
+      optionHelperButton.enabled = true
+      optionHelperButton.toolTipText = "display a panel that shows what command would be executed, given that it was executed on the '${optionBinding?.changeList?.name}' changelist"
+    }
+    else {
+      optionHelperButton.enabled = false
+      optionHelperButton.toolTipText = "disabled because there is no currently active changelist to try the command out on"
+    }
+
     DialogWrapper dialogWrapper = new IdeaDialogWrapper(this, title)
-
     dialogWrapper.resizable = true
-
     dialogWrapper.pack()
+
     dialogWrapper.show()
+
     return dialogWrapper.isOK()
   }
 
