@@ -12,7 +12,6 @@
     <orderEntry type="library" name="jgoodies-forms" level="project" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="PROVIDED" name="groovy-all-1.7.3-IC" level="application" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -24,7 +23,6 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="gradle-cli-1.0-milestone-6" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="devkit" level="application" />
   </component>
 </module>
