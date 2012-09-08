@@ -2,7 +2,7 @@ package net.intellij.plugins.sbt.cla.config
 
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import com.intellij.openapi.project.Project
+
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder
@@ -14,7 +14,7 @@ import com.jgoodies.forms.layout.FormLayout
 import groovy.swing.SwingBuilder
 import javax.swing.JButton
 import javax.swing.JCheckBox
-import javax.swing.JComboBox
+
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -24,16 +24,14 @@ import net.intellij.plugins.sbt.cla.ClaCommand
 import net.intellij.plugins.sbt.cla.ClaProjectComponent
 import net.intellij.plugins.sbt.cla.action.ClaCommandOptionBinding
 import net.intellij.plugins.sbt.cla.util.ClaUtil
-import net.intellij.plugins.sbt.cla.util.SimpleComboRenderer
 
 import java.awt.Dimension
 import com.intellij.openapi.util.SystemInfo
-import com.intellij.openapi.vcs.changes.ChangeListManager
 
 /**
  * could use some validation
  * - change the help icon to an eye, and make it red if error when parsing :)
- * - maybe popop the error as a tooltip when tabbing out?
+ * - maybe popup the error as a tooltip when tabbing out?
  */
 class ClaCommandConfigurator {
   private final Logger log = Logger.getInstance(getClass())
@@ -112,7 +110,7 @@ class ClaCommandConfigurator {
   void layoutComponents(){
     FormLayout layout = new FormLayout(
       "right:pref, [200dlu,pref,600dlu]:grow, pref",
-      "default, default, default, default, default")
+      "default, default, default, default:grow, default")
     panel.setLayout(layout)
     CellConstraints cc = new CellConstraints()
 
@@ -127,8 +125,8 @@ class ClaCommandConfigurator {
     panel.add(workingDirButton, cc.xy(3, 3))
 
     panel.add(new JLabel("Options:"), cc.xy(1, 4))
-
     options.setRows(5)
+
     panel.add(new JBScrollPane(options), cc.xy(2, 4))
     panel.add(optionHelperButton, cc.xy(3, 4, "left, bottom"))
 
@@ -202,37 +200,34 @@ class ClaCommandConfigurator {
    * @return true if user pressed ok button
    */
   boolean showAsIdeaDialog(String title){
-    DialogWrapper dialogWrapper =
-      new IdeaDialogWrapper(projectComponent.project, title);
+    DialogWrapper dialogWrapper = new IdeaDialogWrapper(this, title)
 
-    dialogWrapper.setResizable(true)
+    dialogWrapper.resizable = true
 
-    dialogWrapper.pack();
-    dialogWrapper.show();
-    return dialogWrapper.isOK();
+    dialogWrapper.pack()
+    dialogWrapper.show()
+    return dialogWrapper.isOK()
   }
 
-  /**
-   * The superclass' ctor makes this really hard to groovify, couldn't
-   * figure out and had better things to do.  Maybe post a SO question about
-   * it.
-   */
-  private class IdeaDialogWrapper extends DialogWrapper {
+  private static class IdeaDialogWrapper extends DialogWrapper {
+    ClaCommandConfigurator configurator
 
-    private IdeaDialogWrapper(Project project, String title) {
-      super(project, true);
-      this.setTitle(title);
+    public IdeaDialogWrapper(ClaCommandConfigurator configurator, String title){
+      super(configurator.projectComponent.project, true)
+      this.configurator = configurator
+      this.title = title
 
-      init();
+      init()
     }
 
     protected JComponent createCenterPanel() {
-      return getPanel();
+      return configurator.panel
     }
 
     public JComponent getPreferredFocusedComponent() {
-      return name;
+      return configurator.name
     }
+
   }
 
 
