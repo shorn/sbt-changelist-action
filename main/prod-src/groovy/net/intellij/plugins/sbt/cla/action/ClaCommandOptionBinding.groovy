@@ -44,14 +44,14 @@ class ClaCommandOptionBinding {
   
   /**
    * Takes the given "options script" and executes it to return a list of
-   * Stirng parameters that will be passed to the command to execute.
+   * String parameters that will be passed to the command to execute.
    *
    * This method doesn't do any exception handling, especially
    * {@link GroovyShell#evaluate} exceptions are propogated.
    *
    * Note also that the actual results of the script execution will be passed
-   * through the {@link #flattenEvalResult} method in order to turn anything
-   * that's not a string into a string.
+   * through the {@link #flattenEvalResult} method in order to try to turn
+   * anything that's not a string into a string.
    *
    * @throws OptionParsingException if the expression doesn't evaluate
    * to a list
@@ -95,7 +95,6 @@ class ClaCommandOptionBinding {
    * original list in place of itself.
    */
   private List<String> flattenEvalResult(evalResults) {
-//    log.debug("options eval: $evalResults")
     if (!evalResults instanceof List) {
       // or, we could just call toString on whatever it is
       throw new OptionParsingException(
@@ -126,15 +125,14 @@ class ClaCommandOptionBinding {
    * and will resolve to any property method on this class that is annotated
    * with {@link OptionBinding}.
    *
-   * @return null if coudln't find any appriately named property that is marked,
-   * or if the porperty getter itself returns null.
+   * @return null if coudln't find any appopriately named property that is
+   * marked, or if the property getter itself returns null.
    */
   Object getBindingOptionValue(String varName){
     Method m = null
     ClaUtil.getMethodsForPropertiesWithAnnotation(
       ClaCommandOptionBinding, OptionBinding).each
       { propName, method ->
-//        log.debug "$varName - $propName"
         if( propName == varName ){
           m = method
         }
@@ -185,9 +183,18 @@ class ClaCommandOptionBinding {
     return rootManager.fileIndex
   }
 
-  @OptionBinding("com.intellij.openapi.roots.ProjectFileIndex")
+  @OptionBinding("com.intellij.openapi.vfs.VirtualFile")
   VirtualFile[] getContentRoots(){
     return rootManager.contentRoots
+  }
+
+  @OptionBinding("contentRoots in map keyed by the name property of each root")
+  Map<String, VirtualFile> getRootsByName(){
+    // under newer GDK could be something like:
+    // contentRoots.collectEntries{return [it.name, it] }
+    Map<String, VirtualFile> result = [:]
+    contentRoots.each{ result[it.name] = it}
+    return result
   }
 
   /**
