@@ -1,4 +1,8 @@
-
+/*
+This gradle file is just convenient place for me to put a couple of tasks that I
+was playing around with.  It's not necessary to build the plugin, just use IDEA
+for that (noting to load the project from the ide/idea subdirectory though).
+ */
 mountDir = System.getProperty("mountDir", "../sbt-changelist-action-mnt")
 
 osxRamdiskName = System.getProperty("osxRamdiskName", "ramdisk")
