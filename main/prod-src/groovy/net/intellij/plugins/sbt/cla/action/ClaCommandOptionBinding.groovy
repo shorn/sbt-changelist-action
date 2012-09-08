@@ -189,7 +189,7 @@ class ClaCommandOptionBinding {
   }
 
   @OptionBinding("contentRoots in map keyed by the name property of each root")
-  Map<String, VirtualFile> getRootsByName(){
+  Map<String, VirtualFile> getContentRootsByName(){
     // under newer GDK could be something like:
     // contentRoots.collectEntries{return [it.name, it] }
     Map<String, VirtualFile> result = [:]
