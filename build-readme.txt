@@ -6,7 +6,7 @@ ide/.idea/workspace.xml and .gradle, etc.
 You can get gradle to put its files in another dir, but I've added the .gradle
 dir to the ignore list just in case.  Can't control the location of the
 IDEA workspace file though (grrrr).
-
+X
 
 TODO:SBT create dirs ?
 
