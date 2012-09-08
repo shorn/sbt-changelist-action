@@ -28,6 +28,8 @@ import com.intellij.openapi.diagnostic.Logger
 import groovy.swing.SwingBuilder
 import com.intellij.openapi.vcs.changes.ChangeListManager
 import net.intellij.plugins.sbt.cla.action.ClaCommandOptionBinding
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.ui.popup.JBPopup
 
 class ClaProjectConfigurator {
   private final Logger log = Logger.getInstance(getClass())
@@ -60,8 +62,6 @@ class ClaProjectConfigurator {
     tablePanel.commands.addAll(caState.commands)
   }
 
-
-
   public boolean isConfigEquals(ClaState state) {
     return state.commands.equals(tablePanel.commands)
   }
@@ -84,6 +84,7 @@ class TablePanel {
   JBScrollPane tableScollPane
   JButton addButton
   JButton editButton
+  JButton copyButton
   JButton removeButton
   JButton moveUpButton
   JButton moveDownButton
@@ -106,7 +107,7 @@ class TablePanel {
       "top:pref");
 
     ButtonStackBuilder buttonBuilder = new ButtonStackBuilder();
-    [addButton, editButton, removeButton, moveUpButton, moveDownButton].each{
+    [addButton, editButton, copyButton, removeButton, moveUpButton, moveDownButton].each{
       button ->
         buttonBuilder.addGridded(button);
         buttonBuilder.addRelatedGap();
@@ -120,11 +121,11 @@ class TablePanel {
 
   }
 
-  private JButton createButton(String text, int key){
-    JButton b = new JButton(text);
-    b.setMnemonic(key);
-    return b;
-  }
+//  private JButton createButton(String text, int key){
+//    JButton b = new JButton(text);
+//    b.setMnemonic(key);
+//    return b;
+//  }
 
   private void createComponents() {
     SwingBuilder swing = new SwingBuilder()
@@ -137,6 +138,10 @@ class TablePanel {
       text: "Edit...",
       mnemonic: KeyEvent.VK_E,
       actionPerformed: {editSelectedRow()} )
+    copyButton = swing.button(
+      text: "Copy...",
+      mnemonic: KeyEvent.VK_C,
+      actionPerformed: {copySelectedRow()} )
     removeButton = swing.button(
       text: "Remove",
       mnemonic: KeyEvent.VK_R,
@@ -183,6 +188,26 @@ class TablePanel {
     }
   }
 
+  private copySelectedRow(){
+    if (table.selectionModel.isSelectionEmpty()) {
+      return
+    }
+
+    int selectedRow = table.selectedRow
+
+    ClaCommand oldCmd = commands[selectedRow]
+    ClaCommand newCopyCmd = new ClaCommand()
+    newCopyCmd.name = oldCmd.name + " copy"
+    newCopyCmd.executable = oldCmd.executable
+    newCopyCmd.workingDir = oldCmd.workingDir
+    newCopyCmd.options = oldCmd.options
+    newCopyCmd.clearConsole = oldCmd.clearConsole
+
+    commands.add(selectedRow+1, newCopyCmd);
+    setSelectedRow(selectedRow+1)
+
+  }
+
   private ClaCommandConfigurator createCommandConfigurator() {
     ClaCommandConfigurator editForm =
       new ClaCommandConfigurator(this.projectComponent).init()
@@ -203,18 +228,25 @@ class TablePanel {
       return
     }
 
-    commands.remove(table.selectedRow);
+    Closure onYes = {
+      commands.remove(table.selectedRow);
 
-    // select the row below the old removed one
-    if (!commands.isEmpty()) {
-      int lastRow = table.rowCount - 1
-      if (table.selectedRow < lastRow) {
-        setSelectedRow(table.selectedRow);
-      }
-      else {
-        setSelectedRow(lastRow);
+      // select the row below the old removed one
+      if (!commands.isEmpty()) {
+        int lastRow = table.rowCount - 1
+        if (table.selectedRow < lastRow) {
+          setSelectedRow(table.selectedRow);
+        }
+        else {
+          setSelectedRow(lastRow);
+        }
       }
     }
+
+    JBPopup confirmPopup =
+      JBPopupFactory.instance.createConfirmation("delete command?", onYes, 0)
+    confirmPopup.showInFocusCenter()
+
   }
 
   void editSelectedRow() {
@@ -276,12 +308,12 @@ class TablePanel {
 
   private void adjustButtonEnablement() {
     if( table.selectionModel.isSelectionEmpty() ){
-      [removeButton, editButton, moveUpButton, moveDownButton]*.
+      [removeButton, editButton, copyButton, moveUpButton, moveDownButton]*.
         setEnabled(false)
     }
     else {
-      // if something is selected, then we can remove or edit it
-      [removeButton, editButton]*.setEnabled(true)
+      // if something is selected, then we can remove, edit or copy it
+      [removeButton, editButton, copyButton]*.setEnabled(true)
       // if it's not the first row, then it can be moved up
       moveUpButton.setEnabled(table.getSelectedRow() != 0)
       // if it's not the last row, then it can be moved down
