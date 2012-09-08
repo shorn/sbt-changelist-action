@@ -1,13 +1,19 @@
 <!--suppress XmlUnboundNsPrefix -->
 <idea-plugin url="http://bitbucket.org/shorn/sbt-changelist-action/wiki/Home">
   <name>SBT ChangeListAction</name>
-  <description>
-    Provides the ability to define custom actions that you can invoke on
-    any VCS changelist in order to execute OS commands against the changelist
-    content.
-    There's documentation available at the homepage.
+  <description><![CDATA[
+    <p>Provides the ability to define custom actions that you can invoke on
+    any VCS changelist in order to execute operating system commands against
+    the changelist content.
+    </p>
+    <p>There's documentation available at the homepage.
+    </p>
+    <p>Note that this plugin is not related to Scala or SBT, it's intended to be
+    used with any batch file or shell script on the OS.
+    </p>
+    ]]>
   </description>
-  <version>1.0</version>
+  <version>1.1</version>
   <vendor email="claplugin-shorn splat sneakemail com"
           logo="/net/intellij/plugins/sbt/cla/icons/frog16.png">
     Shorn Tolley
@@ -15,6 +21,16 @@
 
   <idea-version since-build="111.69"/>
   <change-notes><![CDATA[
+    <p>1.1</p>
+    <ul>
+      <li>changed email address because of spam (I think they're scraping the bit-butcket source code, not the JetBrains site)</li>
+      <li>back-dated plugin version compatibility to 11.0</li>
+      <li>added a simple way to access content roots by name instead of by index - "contentRootsByName"</li>
+      <li>added a copy button to the project configurator to allow duplicating commands</li>
+      <li>added a confirmation popup to the remove button on the project configurator</li>
+      <li>added a tooltip to the preview button on the command configurator</li>
+      <li>made the options field row in the command configurator fill empty space when re-sizing the dialog</li>
+    </ul>
     <p>1.0</p>
     <ul>
       <li>recompiled with IDEA 11.1.2</li>
