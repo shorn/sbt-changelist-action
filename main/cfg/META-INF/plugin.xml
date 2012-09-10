@@ -21,6 +21,15 @@
 
   <idea-version since-build="111.69"/>
   <change-notes><![CDATA[
+    <p>1.2</p>
+    <ul>
+      <li>re-wrote IdeaDialogWrapper in Java to workaround packaging problem with Groovy,
+      seems to have something to do with groovy subclasses of java classes with inner classes)</li>
+      <li>disable copy button when first display project configurator with empty command list</li>
+      <li>getRelativePaths() and getRelativePathsFile() added to the to the options binding to allow more
+        betterer access to content roots by name (remember content roots and modules are different,
+        one module can have many content roots)</li>
+    </ul>
     <p>1.1</p>
     <ul>
       <li>changed email address because of spam (I think they're scraping the bit-butcket source code, not the JetBrains site)</li>

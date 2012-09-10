@@ -217,6 +217,17 @@ class ClaCommandOptionBinding {
     }
   }
 
+  @OptionBinding("return a List<String> of file paths of each change relative to the contentRoot indicated")
+  List<String> getRelativePaths(String contentRootName) {
+    VirtualFile root = contentRootsByName[contentRootName]
+
+    return changeList.changes.collect { Change change ->
+      // the "-'/'" chops off any beginning slash because the paths
+      // we want to return are relative
+      return getContentRevision(change).file.path - root.getPath() - '/'
+    }
+  }
+
   /**
    * Tries to get a content revision from a file, prefers the "afterRevision"
    * but if that's not available (because file was deleted)
@@ -239,6 +250,12 @@ class ClaCommandOptionBinding {
   @OptionBinding("returns the absolute filename of a file containing the list of paths (relative to the indicated contentRoot) of files in the changelist")
   String getRelativePathsFile(int contentRootIndex){
     List<String> relativeChanges = getRelativePaths(contentRootIndex)
+    return ClaUtil.writeLnToTempFile(relativeChanges).path
+  }
+
+  @OptionBinding("returns the absolute filename of a file containing the list of paths (relative to the indicated contentRoot) of files in the changelist")
+  String getRelativePathsFile(String contentRootName){
+    List<String> relativeChanges = getRelativePaths(contentRootName)
     return ClaUtil.writeLnToTempFile(relativeChanges).path
   }
 
