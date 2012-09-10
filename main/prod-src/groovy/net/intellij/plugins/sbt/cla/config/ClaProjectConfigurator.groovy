@@ -121,12 +121,6 @@ class TablePanel {
 
   }
 
-//  private JButton createButton(String text, int key){
-//    JButton b = new JButton(text);
-//    b.setMnemonic(key);
-//    return b;
-//  }
-
   private void createComponents() {
     SwingBuilder swing = new SwingBuilder()
 
