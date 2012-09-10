@@ -154,7 +154,8 @@ class TablePanel {
       text: "Move Down",
       mnemonic: KeyEvent.VK_D,
       actionPerformed: {moveSelectedRow(+1)} )
-    [editButton, removeButton, moveUpButton, moveDownButton]*.setEnabled(false)
+    [editButton, copyButton, removeButton, moveUpButton, moveDownButton]*.
+      setEnabled(false)
 
     table = createTable(commands)
     tableScollPane = new JBScrollPane(
