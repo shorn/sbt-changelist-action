@@ -11,6 +11,13 @@ X
 TODO:SBT create dirs ?
 
 
+devkit module library that contains devkit.jar
+  I don't remember why I added this.  I used to have it as a global lib, but
+  then I couldn't tell WTH I was missing when I tried to build on other
+  machines.  So I've converted it to a module library, but I still can't
+  remember what it's for.
+
+
 Viewing logs.
 Logs from this plugin are written to the normal $LOG_DIR$/idea.log file, but this
 can be configured via the log.xml file.

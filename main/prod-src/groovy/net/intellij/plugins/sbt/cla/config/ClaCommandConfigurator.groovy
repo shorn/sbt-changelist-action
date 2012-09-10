@@ -211,9 +211,8 @@ class ClaCommandConfigurator {
     // doing it here at the last possible moment :)
     configureOptionHelper()
 
-    DialogWrapper dialogWrapper = new IdeaDialogWrapper(
+    DialogWrapper dialogWrapper = new IdeaDialogWrapperJava(
       centerPanel: panel, preferredFocus: name, resizable: true)
-
     dialogWrapper.initPackShow()
 
     return dialogWrapper.isOK()

@@ -23,7 +23,7 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="devkit" level="application" />
+    <orderEntry type="library" name="devkit" level="project" />
   </component>
 </module>
 
