@@ -209,6 +209,17 @@ class ClaCommandConfigurator {
 
     // I don't want to think about the "right" time to do this, so I'm just
     // doing it here at the last possible moment :)
+    configureOptionHelper()
+
+    DialogWrapper dialogWrapper = new IdeaDialogWrapper(
+      centerPanel: panel, preferredFocus: name, resizable: true)
+
+    dialogWrapper.initPackShow()
+
+    return dialogWrapper.isOK()
+  }
+
+  private void configureOptionHelper() {
     if (optionBinding) {
       optionHelperButton.enabled = true
       optionHelperButton.toolTipText = "display a panel that shows what command would be executed, given that it was executed on the '${optionBinding?.changeList?.name}' changelist"
@@ -217,36 +228,6 @@ class ClaCommandConfigurator {
       optionHelperButton.enabled = false
       optionHelperButton.toolTipText = "disabled because there is no currently active changelist to try the command out on"
     }
-
-    DialogWrapper dialogWrapper = new IdeaDialogWrapper(this, title)
-    dialogWrapper.resizable = true
-    dialogWrapper.pack()
-
-    dialogWrapper.show()
-
-    return dialogWrapper.isOK()
   }
-
-  private static class IdeaDialogWrapper extends DialogWrapper {
-    ClaCommandConfigurator configurator
-
-    public IdeaDialogWrapper(ClaCommandConfigurator configurator, String title){
-      super(configurator.projectComponent.project, true)
-      this.configurator = configurator
-      this.title = title
-
-      init()
-    }
-
-    protected JComponent createCenterPanel() {
-      return configurator.panel
-    }
-
-    public JComponent getPreferredFocusedComponent() {
-      return configurator.name
-    }
-
-  }
-
 
 }
