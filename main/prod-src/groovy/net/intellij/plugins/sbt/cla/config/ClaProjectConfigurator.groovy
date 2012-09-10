@@ -89,6 +89,8 @@ class TablePanel {
   JButton moveUpButton
   JButton moveDownButton
 
+  JButton[] allButtons
+
   TablePanel(ClaProjectComponent projectComponent) {
     this.projectComponent = projectComponent
     commands = GlazedLists.threadSafeList(
@@ -107,7 +109,7 @@ class TablePanel {
       "top:pref");
 
     ButtonStackBuilder buttonBuilder = new ButtonStackBuilder();
-    [addButton, editButton, copyButton, removeButton, moveUpButton, moveDownButton].each{
+    allButtons.each{
       button ->
         buttonBuilder.addGridded(button);
         buttonBuilder.addRelatedGap();
@@ -117,8 +119,6 @@ class TablePanel {
     CellConstraints cc = new CellConstraints();
     panel.add(tableScollPane, cc.xy(1, 1));
     panel.add(buttonBuilder.panel, cc.xy(3, 1));
-
-
   }
 
   private void createComponents() {
@@ -148,8 +148,13 @@ class TablePanel {
       text: "Move Down",
       mnemonic: KeyEvent.VK_D,
       actionPerformed: {moveSelectedRow(+1)} )
-    [editButton, copyButton, removeButton, moveUpButton, moveDownButton]*.
-      setEnabled(false)
+
+    allButtons = [
+      addButton, editButton, copyButton, removeButton,
+      moveUpButton, moveDownButton]
+
+    allButtons*.enabled = false
+    addButton.enabled = true
 
     table = createTable(commands)
     tableScollPane = new JBScrollPane(
@@ -302,9 +307,8 @@ class TablePanel {
   }
 
   private void adjustButtonEnablement() {
-    if( table.selectionModel.isSelectionEmpty() ){
-      [removeButton, editButton, copyButton, moveUpButton, moveDownButton]*.
-        setEnabled(false)
+    if( table.selectionModel.selectionEmpty ){
+      (allButtons - addButton)*.enabled = false
     }
     else {
       // if something is selected, then we can remove, edit or copy it
