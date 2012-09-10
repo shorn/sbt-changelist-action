@@ -139,7 +139,7 @@ class TablePanel {
     removeButton = swing.button(
       text: "Remove",
       mnemonic: KeyEvent.VK_R,
-      actionPerformed: {this.removeSelectedRow()} )
+      actionPerformed: {confirmRemoveSelectedRow()} )
     moveUpButton = swing.button(
       text: "Move Up",
       mnemonic: KeyEvent.VK_U,
@@ -223,30 +223,34 @@ class TablePanel {
     return editForm
   }
 
-  private removeSelectedRow() {
+  private confirmRemoveSelectedRow() {
     if (table.selectionModel.isSelectionEmpty()) {
       return
     }
 
-    Closure onYes = {
-      commands.remove(table.selectedRow);
+    JBPopup confirmPopup =
+      JBPopupFactory.instance.createConfirmation(
+        "delete command?", {removeSelectedRow()}, 0)
+    confirmPopup.showInFocusCenter()
+  }
 
-      // select the row below the old removed one
-      if (!commands.isEmpty()) {
-        int lastRow = table.rowCount - 1
-        if (table.selectedRow < lastRow) {
-          setSelectedRow(table.selectedRow);
-        }
-        else {
-          setSelectedRow(lastRow);
-        }
-      }
+  private void removeSelectedRow() {
+    if (table.selectionModel.isSelectionEmpty()) {
+      return
     }
 
-    JBPopup confirmPopup =
-      JBPopupFactory.instance.createConfirmation("delete command?", onYes, 0)
-    confirmPopup.showInFocusCenter()
+    commands.remove(table.selectedRow);
 
+    // select the row below the old removed one
+    if (!commands.isEmpty()) {
+      int lastRow = table.rowCount - 1
+      if (table.selectedRow < lastRow) {
+        setSelectedRow(table.selectedRow);
+      }
+      else {
+        setSelectedRow(lastRow);
+      }
+    }
   }
 
   void editSelectedRow() {
