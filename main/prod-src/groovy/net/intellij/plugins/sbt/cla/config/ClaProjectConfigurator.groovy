@@ -238,16 +238,16 @@ class TablePanel {
       return
     }
 
-    commands.remove(table.selectedRow);
+    commands.remove(table.selectedRow)
 
     // select the row below the old removed one
-    if (!commands.isEmpty()) {
+    if (!commands.empty) {
       int lastRow = table.rowCount - 1
       if (table.selectedRow < lastRow) {
-        setSelectedRow(table.selectedRow);
+        selectedRow = table.selectedRow
       }
       else {
-        setSelectedRow(lastRow);
+        selectedRow = lastRow
       }
     }
   }
@@ -283,7 +283,7 @@ class TablePanel {
   }
 
   public void setSelectedRow(int selectedRow){
-    table.getSelectionModel().setSelectionInterval(selectedRow, selectedRow);
+    table.selectionModel.setSelectionInterval(selectedRow, selectedRow)
   }
 
 
