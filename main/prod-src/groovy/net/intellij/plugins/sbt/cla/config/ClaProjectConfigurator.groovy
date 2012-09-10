@@ -103,24 +103,6 @@ class TablePanel {
     return this
   }
 
-  private layoutComponents() {
-    FormLayout layout = new FormLayout(
-      "pref:grow, 2dlu, pref, 2dlu",
-      "top:pref");
-
-    ButtonStackBuilder buttonBuilder = new ButtonStackBuilder();
-    allButtons.each{
-      button ->
-        buttonBuilder.addGridded(button);
-        buttonBuilder.addRelatedGap();
-    }
-
-    panel.setLayout(layout)
-    CellConstraints cc = new CellConstraints();
-    panel.add(tableScollPane, cc.xy(1, 1));
-    panel.add(buttonBuilder.panel, cc.xy(3, 1));
-  }
-
   private void createComponents() {
     SwingBuilder swing = new SwingBuilder()
 
@@ -153,9 +135,6 @@ class TablePanel {
       addButton, editButton, copyButton, removeButton,
       moveUpButton, moveDownButton]
 
-    allButtons*.enabled = false
-    addButton.enabled = true
-
     table = createTable(commands)
     tableScollPane = new JBScrollPane(
       table,
@@ -166,6 +145,26 @@ class TablePanel {
     table.selectionModel.valueChanged =
       { if(!it.valueIsAdjusting) adjustButtonEnablement() }
     table.mouseClicked = { if(it.getClickCount() == 2) editSelectedRow() }
+  }
+
+  private layoutComponents() {
+    FormLayout layout = new FormLayout(
+      "pref:grow, 2dlu, pref, 2dlu",
+      "top:pref");
+
+    ButtonStackBuilder buttonBuilder = new ButtonStackBuilder();
+    allButtons.each{
+      button ->
+        buttonBuilder.addGridded(button);
+        buttonBuilder.addRelatedGap();
+    }
+    allButtons*.enabled = false
+    addButton.enabled = true
+
+    panel.setLayout(layout)
+    CellConstraints cc = new CellConstraints();
+    panel.add(tableScollPane, cc.xy(1, 1));
+    panel.add(buttonBuilder.panel, cc.xy(3, 1));
   }
 
   private moveSelectedRow(int movement) {
