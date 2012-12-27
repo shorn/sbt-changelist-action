@@ -13,14 +13,18 @@
     </p>
     ]]>
   </description>
-  <version>1.2b</version>
+  <version>1.3</version>
   <vendor email="claplugin-shorn splat sneakemail com"
           logo="/net/intellij/plugins/sbt/cla/icons/frog16.png">
     Shorn Tolley
   </vendor>
 
-  <idea-version since-build="111.69"/>
+  <idea-version since-build="123.0"/>
   <change-notes><![CDATA[
+    <p>1.3</p>
+    <ul>
+      <li>Recompiled with IDEA 12.0.1</li>
+    </ul>
     <p>1.2</p>
     <ul>
       <li>re-wrote IdeaDialogWrapper in Java to workaround packaging problem with Groovy,
